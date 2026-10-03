@@ -1,0 +1,57 @@
+.card {
+  padding: 16px 12px 16px 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.label {
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 500;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.value {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 16px;
+  line-height: 22px;
+  font-weight: 700;
+  color: var(--text-strong);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.action {
+  width: 44px;
+  height: 44px;
+  flex: none;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--icon);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 150ms;
+}
+
+.action:hover {
+  background: rgb(255 255 255 / 0.06);
+}
+
+.copied {
+  color: var(--accent);
+}

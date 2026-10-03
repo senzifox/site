@@ -1,0 +1,22 @@
+.link {
+  flex: 0 1 52px;
+  min-width: 34px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.05);
+  border: 1px solid rgb(255 255 255 / 0.1);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent);
+  transition:
+    background 200ms,
+    transform 200ms;
+}
+
+.link:hover {
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  transform: translateY(-2px);
+}

@@ -1,0 +1,12 @@
+node_modules
+.next
+.git
+.github
+docs
+assets
+scripts
+*.md
+.env
+.env.*
+Dockerfile
+compose.yaml

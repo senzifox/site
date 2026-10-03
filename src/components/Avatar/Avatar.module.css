@@ -1,0 +1,16 @@
+.avatar {
+  display: block;
+  overflow: visible;
+}
+
+.sparks {
+  fill: var(--accent);
+  stroke: var(--accent);
+  stroke-linejoin: round;
+}
+
+.outline {
+  fill: none;
+  stroke: var(--accent);
+  stroke-linejoin: round;
+}

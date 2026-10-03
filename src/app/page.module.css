@@ -1,0 +1,11 @@
+.main {
+  position: relative;
+  z-index: 1;
+  max-width: var(--container);
+  min-height: calc(100vh + var(--header-range));
+  margin: 0 auto;
+  padding: calc(var(--header-expanded) + 12px) var(--gutter) 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}

@@ -1,0 +1,20 @@
+.card {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.title {
+  margin: 0;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+  color: var(--accent);
+}
+
+.text {
+  font-size: 20px;
+  line-height: 28px;
+  text-wrap: pretty;
+}

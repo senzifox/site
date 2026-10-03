@@ -1,0 +1,88 @@
+.header {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  translate: -50% 0;
+  width: min(100%, var(--container));
+  height: var(--header-expanded);
+  border-bottom: 1px solid transparent;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.glow {
+  position: absolute;
+  left: 50%;
+  top: 150px;
+  width: 320px;
+  height: 320px;
+  margin: -160px 0 0 -160px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(var(--glow2) / 0.35), transparent 65%);
+}
+
+.track {
+  position: absolute;
+  inset: 0 0 auto;
+  will-change: transform;
+}
+
+.item {
+  display: block;
+  width: max-content;
+  transform-origin: 0 0;
+  white-space: nowrap;
+  will-change: transform;
+}
+
+.avatar {
+  pointer-events: auto;
+}
+
+.lineAbove {
+  font-size: 15px;
+  line-height: 26px;
+  font-weight: 500;
+  letter-spacing: 0.1px;
+  color: var(--soft);
+}
+
+.name {
+  font-size: 34px;
+  line-height: 40px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: var(--text-strong);
+}
+
+.rotating {
+  display: inline-block;
+  transition: opacity 600ms ease-in-out;
+}
+
+.hidden {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rotating {
+    transition: none;
+  }
+}
+
+.lineBelow {
+  font-size: 15px;
+  line-height: 24px;
+  color: var(--text-muted);
+}
+
+.socials {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 384px;
+  padding: 0 var(--gutter);
+  display: flex;
+  justify-content: center;
+  gap: clamp(6px, 2.5vw, 12px);
+}
