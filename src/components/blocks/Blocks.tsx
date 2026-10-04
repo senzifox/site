@@ -3,15 +3,15 @@ import type { Block } from "@/content/types";
 import { ClockBlock } from "./ClockBlock/ClockBlock";
 import { CodeBlock } from "./CodeBlock/CodeBlock";
 import { ListBlock } from "./ListBlock/ListBlock";
-import { NowPlaying } from "./NowPlaying/NowPlaying";
+import { NowSpotify } from "./NowSpotify/NowSpotify";
 import { StatusBlock } from "./StatusBlock/StatusBlock";
 import { TextBlock } from "./TextBlock/TextBlock";
 import { CopyBlock, LinkBlock } from "./ValueBlock/ValueBlock";
 
 function renderBlock(block: Block) {
   switch (block.type) {
-    case "nowPlaying":
-      return <NowPlaying {...block} />;
+    case "nowSpotify":
+      return <NowSpotify {...block} />;
     case "text":
       return <TextBlock {...block} />;
     case "copy":

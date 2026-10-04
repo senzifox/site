@@ -27,7 +27,7 @@ export const site: Site = {
       text: "",
     },
     {
-      type: "nowPlaying",
+      type: "nowSpotify",
       label: "сейчас играет",
       idleText: "сейчас ничего не играет(",
       idleHint: "но ты можешь перейти на профиль",

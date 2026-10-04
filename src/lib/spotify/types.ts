@@ -8,6 +8,6 @@ export type Track = {
   durationMs: number;
 };
 
-export type NowPlaying = Track | { isPlaying: false };
+export type NowSpotify = Track | { isPlaying: false };
 
-export const idle: NowPlaying = { isPlaying: false };
+export const spotifyIdle: NowSpotify = { isPlaying: false };

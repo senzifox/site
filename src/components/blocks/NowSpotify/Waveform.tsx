@@ -1,5 +1,5 @@
 import { isBarPlayed, waveformBars } from "@/lib/waveform";
-import styles from "./NowPlaying.module.css";
+import styles from "./NowSpotify.module.css";
 
 export function Waveform({ progress }: { progress: number }) {
   return (

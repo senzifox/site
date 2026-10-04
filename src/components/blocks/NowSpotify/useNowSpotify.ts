@@ -1,15 +1,15 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { idle, type NowPlaying } from "@/lib/now-playing/types";
+import { type NowSpotify, spotifyIdle } from "@/lib/spotify/types";
 
 const POLL_MS = 15_000;
 const TICK_MS = 1_000;
 const TRACK_END_GRACE_MS = 1_500;
 
-type Snapshot = { data: NowPlaying; receivedAt: number };
+type Snapshot = { data: NowSpotify; receivedAt: number };
 
-export function useNowPlaying() {
+export function useNowSpotify() {
   const [snapshot, setSnapshot] = useState<Snapshot | null>(null);
   const [now, setNow] = useState(() => Date.now());
   const inFlight = useRef<AbortController | null>(null);
@@ -19,14 +19,14 @@ export function useNowPlaying() {
     const controller = new AbortController();
     inFlight.current = controller;
     try {
-      const response = await fetch("/api/now-playing", { cache: "no-store", signal: controller.signal });
-      if (!response.ok) throw new Error(`now-playing ${response.status}`);
-      const data = (await response.json()) as NowPlaying;
+      const response = await fetch("/api/now-spotify", { cache: "no-store", signal: controller.signal });
+      if (!response.ok) throw new Error(`now-spotify ${response.status}`);
+      const data = (await response.json()) as NowSpotify;
       if (controller.signal.aborted) return;
       setSnapshot({ data, receivedAt: Date.now() });
     } catch {
       if (controller.signal.aborted) return;
-      setSnapshot((current) => current ?? { data: idle, receivedAt: Date.now() });
+      setSnapshot((current) => current ?? { data: spotifyIdle, receivedAt: Date.now() });
     }
   }, []);
 

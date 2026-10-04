@@ -4,10 +4,10 @@ import { AnimatePresence, motion } from "motion/react";
 import { Badge } from "@/components/Badge/Badge";
 import { cardClass } from "@/components/Card/Card";
 import { Icon } from "@/components/Icon/Icon";
-import type { NowPlayingBlock } from "@/content/types";
+import type { NowSpotifyBlock } from "@/content/types";
 import { formatTime } from "@/lib/format";
-import styles from "./NowPlaying.module.css";
-import { useNowPlaying } from "./useNowPlaying";
+import styles from "./NowSpotify.module.css";
+import { useNowSpotify } from "./useNowSpotify";
 import { Waveform } from "./Waveform";
 
 const fade = {
@@ -42,8 +42,8 @@ function Idle({ text, hint, href }: { text: string; hint?: string; href?: string
   );
 }
 
-export function NowPlaying({ label, idleText, idleHint, href }: NowPlayingBlock) {
-  const state = useNowPlaying();
+export function NowSpotify({ label, idleText, idleHint, href }: NowSpotifyBlock) {
+  const state = useNowSpotify();
 
   return (
     <motion.section

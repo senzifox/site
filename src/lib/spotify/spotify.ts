@@ -1,5 +1,5 @@
-import { cached } from "./cache";
-import { idle, type NowPlaying } from "./types";
+import { cached } from "@/lib/cache";
+import { type NowSpotify, spotifyIdle } from "./types";
 
 type Image = { url: string; width: number | null };
 
@@ -19,6 +19,7 @@ type CurrentlyPlaying = {
 };
 
 const COVER_TARGET_WIDTH = 240;
+const TIMEOUT_MS = 3_000;
 const TOKEN_URL = "https://accounts.spotify.com/api/token";
 const PLAYER_URL = "https://api.spotify.com/v1/me/player/currently-playing?additional_types=track,episode";
 
@@ -27,7 +28,7 @@ export const pickImage = (images: Image[], target = COVER_TARGET_WIDTH) => {
   return (sorted.find((image) => (image.width ?? 0) >= target) ?? sorted.at(-1))?.url ?? "";
 };
 
-export const advance = (data: NowPlaying, elapsedMs: number): NowPlaying =>
+export const advance = (data: NowSpotify, elapsedMs: number): NowSpotify =>
   data.isPlaying
     ? { ...data, progressMs: Math.min(data.durationMs, data.progressMs + Math.max(0, elapsedMs)) }
     : data;
@@ -42,9 +43,9 @@ class SpotifyError extends Error {
   }
 }
 
-export const toNowPlaying = (payload: CurrentlyPlaying | null): NowPlaying => {
+export const toNowSpotify = (payload: CurrentlyPlaying | null): NowSpotify => {
   const item = payload?.item;
-  if (!payload?.is_playing || !item) return idle;
+  if (!payload?.is_playing || !item) return spotifyIdle;
 
   if (payload.currently_playing_type === "episode") {
     return {
@@ -58,7 +59,7 @@ export const toNowPlaying = (payload: CurrentlyPlaying | null): NowPlaying => {
     };
   }
 
-  if (payload.currently_playing_type !== "track") return idle;
+  if (payload.currently_playing_type !== "track") return spotifyIdle;
 
   return {
     isPlaying: true,
@@ -96,6 +97,7 @@ const accessToken = async ({ clientId, clientSecret, refreshToken }: Credentials
     },
     body: new URLSearchParams({ grant_type: "refresh_token", refresh_token: refreshToken }),
     cache: "no-store",
+    signal: AbortSignal.timeout(TIMEOUT_MS),
   });
   if (!response.ok) throw new SpotifyError("token", response);
 
@@ -104,14 +106,15 @@ const accessToken = async ({ clientId, clientSecret, refreshToken }: Credentials
   return token.value;
 };
 
-const loadNowPlaying = async (): Promise<NowPlaying> => {
+const loadNowSpotify = async (): Promise<NowSpotify> => {
   const credentials = readCredentials();
-  if (!credentials) return idle;
+  if (!credentials) return spotifyIdle;
 
   const request = async () =>
     fetch(PLAYER_URL, {
       headers: { Authorization: `Bearer ${await accessToken(credentials)}` },
       cache: "no-store",
+      signal: AbortSignal.timeout(TIMEOUT_MS),
     });
 
   let response = await request();
@@ -119,15 +122,15 @@ const loadNowPlaying = async (): Promise<NowPlaying> => {
     token = null;
     response = await request();
   }
-  if (response.status === 204) return idle;
+  if (response.status === 204) return spotifyIdle;
   if (!response.ok) throw new SpotifyError("player", response);
 
-  return toNowPlaying((await response.json()) as CurrentlyPlaying);
+  return toNowSpotify((await response.json()) as CurrentlyPlaying);
 };
 
-const loadCached = cached(loadNowPlaying, { ttlMs: 10_000, errorTtlMs: 5_000 });
+const loadCached = cached(loadNowSpotify, { ttlMs: 10_000, errorTtlMs: 5_000 });
 
-export const getNowPlaying = async () => {
+export const getNowSpotify = async () => {
   const { data, fetchedAt } = await loadCached();
   return advance(data, Date.now() - fetchedAt);
 };
