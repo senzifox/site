@@ -16,7 +16,25 @@ export type CopyBlock = { type: "copy"; icon: IconName; label: string; value: st
 
 export type LinkBlock = { type: "link"; icon: IconName; label: string; value: string; href: string };
 
-export type Block = NowPlayingBlock | TextBlock | CopyBlock | LinkBlock;
+export type ListBlock = { type: "list"; label?: string; items: string[] };
+
+export type CodeBlock = { type: "code"; label?: string; lines: string[] };
+
+export type StatusState = "online" | "busy" | "offline";
+
+export type StatusBlock = { type: "status"; label?: string; text: string; state?: StatusState };
+
+export type ClockBlock = { type: "clock"; label?: string; timeZone: string };
+
+export type Block =
+  | NowPlayingBlock
+  | TextBlock
+  | CopyBlock
+  | LinkBlock
+  | ListBlock
+  | CodeBlock
+  | StatusBlock
+  | ClockBlock;
 
 export type Site = {
   meta: { title: string; description: string; url: string; locale: string; keywords?: string[] };

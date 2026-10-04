@@ -1,6 +1,10 @@
 import { Fragment } from "react";
 import type { Block } from "@/content/types";
+import { ClockBlock } from "./ClockBlock/ClockBlock";
+import { CodeBlock } from "./CodeBlock/CodeBlock";
+import { ListBlock } from "./ListBlock/ListBlock";
 import { NowPlaying } from "./NowPlaying/NowPlaying";
+import { StatusBlock } from "./StatusBlock/StatusBlock";
 import { TextBlock } from "./TextBlock/TextBlock";
 import { CopyBlock, LinkBlock } from "./ValueBlock/ValueBlock";
 
@@ -14,6 +18,14 @@ function renderBlock(block: Block) {
       return <CopyBlock {...block} />;
     case "link":
       return <LinkBlock {...block} />;
+    case "list":
+      return <ListBlock {...block} />;
+    case "code":
+      return <CodeBlock {...block} />;
+    case "status":
+      return <StatusBlock {...block} />;
+    case "clock":
+      return <ClockBlock {...block} />;
     default:
       return block satisfies never;
   }

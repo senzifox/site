@@ -1,0 +1,24 @@
+.card {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.label {
+  margin: 0;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+  color: var(--accent);
+}
+
+.time {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 28px;
+  line-height: 32px;
+  font-weight: 700;
+  color: var(--text-strong);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 1px;
+}
