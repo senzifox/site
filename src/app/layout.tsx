@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { JetBrains_Mono, Roboto_Flex } from "next/font/google";
 import type { ReactNode } from "react";
 import { site } from "@/content/site";
+import { personJsonLd } from "@/lib/jsonLd";
 import "./globals.css";
 
 const sans = Roboto_Flex({
@@ -24,7 +25,10 @@ export const metadata: Metadata = {
   metadataBase: new URL(url),
   title,
   description,
+  keywords: site.meta.keywords,
   applicationName: site.header.name,
+  authors: [{ name: site.header.name, url }],
+  creator: site.header.name,
   alternates: { canonical: "/" },
   openGraph: { type: "website", url: "/", siteName: site.header.name, title, description, locale },
   twitter: { card: "summary_large_image", title, description },
@@ -41,7 +45,14 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="ru" className={`${sans.variable} ${mono.variable}`}>
-      <body suppressHydrationWarning>{children}</body>
+      <body suppressHydrationWarning>
+        <script
+          type="application/ld+json"
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: static JSON-LD built from site config
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd()) }}
+        />
+        {children}
+      </body>
     </html>
   );
 }

@@ -19,7 +19,7 @@ export type LinkBlock = { type: "link"; icon: IconName; label: string; value: st
 export type Block = NowPlayingBlock | TextBlock | CopyBlock | LinkBlock;
 
 export type Site = {
-  meta: { title: string; description: string; url: string; locale: string };
+  meta: { title: string; description: string; url: string; locale: string; keywords?: string[] };
   header: {
     name: string;
     lineAbove?: string | string[];
