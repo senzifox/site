@@ -10,6 +10,15 @@ export type NowSpotifyBlock = {
   href?: string;
 };
 
+export type NowSteamBlock = {
+  type: "nowSteam";
+  label: string;
+  idleText: string;
+  idleHint?: string;
+  recentHint?: string;
+  href?: string;
+};
+
 export type TextBlock = { type: "text"; title?: string; text?: string };
 
 export type CopyBlock = { type: "copy"; icon: IconName; label: string; value: string };
@@ -28,6 +37,7 @@ export type ClockBlock = { type: "clock"; label?: string; timeZone: string };
 
 export type Block =
   | NowSpotifyBlock
+  | NowSteamBlock
   | TextBlock
   | CopyBlock
   | LinkBlock

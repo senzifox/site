@@ -4,6 +4,7 @@ import { ClockBlock } from "./ClockBlock/ClockBlock";
 import { CodeBlock } from "./CodeBlock/CodeBlock";
 import { ListBlock } from "./ListBlock/ListBlock";
 import { NowSpotify } from "./NowSpotify/NowSpotify";
+import { NowSteam } from "./NowSteam/NowSteam";
 import { StatusBlock } from "./StatusBlock/StatusBlock";
 import { TextBlock } from "./TextBlock/TextBlock";
 import { CopyBlock, LinkBlock } from "./ValueBlock/ValueBlock";
@@ -12,6 +13,8 @@ function renderBlock(block: Block) {
   switch (block.type) {
     case "nowSpotify":
       return <NowSpotify {...block} />;
+    case "nowSteam":
+      return <NowSteam {...block} />;
     case "text":
       return <TextBlock {...block} />;
     case "copy":
