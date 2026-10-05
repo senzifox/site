@@ -1,0 +1,65 @@
+.card {
+  padding: 12px;
+  overflow: hidden;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-height: 52px;
+  padding: 4px 0 4px 4px;
+  color: var(--text-strong);
+}
+
+.body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.live {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  line-height: 16px;
+  font-weight: 600;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--soft);
+}
+
+.liveLogo {
+  flex: none;
+  margin-left: auto;
+  color: var(--accent);
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.text,
+.hint {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.text {
+  font-size: 16px;
+  line-height: 22px;
+  color: color-mix(in srgb, var(--text-strong) 60%, transparent);
+}
+
+.hint {
+  font-size: 14px;
+  line-height: 20px;
+  color: color-mix(in srgb, var(--text-strong) 42%, transparent);
+}

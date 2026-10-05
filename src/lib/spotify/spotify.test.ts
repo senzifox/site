@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { advance, pickImage, toSpotifyNow } from "./spotify";
+import { pickImage, toSpotifyNow } from "./spotify";
+import { advance } from "./types";
 
 const images = [
   { url: "640", width: 640 },

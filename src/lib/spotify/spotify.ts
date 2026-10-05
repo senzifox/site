@@ -1,5 +1,5 @@
 import { cached } from "@/lib/cache";
-import { type SpotifyNow, spotifyIdle } from "./types";
+import { advance, type SpotifyNow, spotifyIdle } from "./types";
 
 type Image = { url: string; width: number | null };
 
@@ -27,11 +27,6 @@ export const pickImage = (images: Image[], target = COVER_TARGET_WIDTH) => {
   const sorted = [...images].sort((a, b) => (a.width ?? 0) - (b.width ?? 0));
   return (sorted.find((image) => (image.width ?? 0) >= target) ?? sorted.at(-1))?.url ?? "";
 };
-
-export const advance = (data: SpotifyNow, elapsedMs: number): SpotifyNow =>
-  data.isPlaying
-    ? { ...data, progressMs: Math.min(data.durationMs, data.progressMs + Math.max(0, elapsedMs)) }
-    : data;
 
 class SpotifyError extends Error {
   retryAfterMs?: number;

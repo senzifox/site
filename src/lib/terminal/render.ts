@@ -2,7 +2,7 @@ import type { StatusState, TerminalRow } from "@/content/types";
 import { formatAgo, formatUptime } from "@/lib/format";
 import type { GithubPush } from "@/lib/github/github";
 import type { SpotifyNow } from "@/lib/spotify/types";
-import type { SteamNow } from "@/lib/steam/types";
+import { fillGame, type SteamNow } from "@/lib/steam/types";
 import { fox } from "./fox";
 
 export type Live = {
@@ -85,7 +85,7 @@ const clock = (timeZone: string) => {
 
 const steam = (row: Extract<TerminalRow, { type: "steam" }>, now: SteamNow) => {
   if (now.isPlaying) return now.game.name;
-  if (now.recent && row.recentText) return row.recentText.replace("{game}", now.recent.name);
+  if (now.recent && row.recentText) return fillGame(row.recentText, now.recent.name);
   return row.idleText;
 };
 

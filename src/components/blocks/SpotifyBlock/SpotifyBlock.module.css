@@ -1,10 +1,3 @@
-.card {
-  padding: 12px;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
 .player {
   display: flex;
   gap: 16px;
@@ -43,42 +36,6 @@
   flex-direction: column;
   gap: 4px;
   min-width: 0;
-}
-
-.live {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 11px;
-  line-height: 16px;
-  font-weight: 600;
-  letter-spacing: 0.6px;
-  text-transform: uppercase;
-  color: var(--soft);
-}
-
-.liveLogo {
-  flex: none;
-  margin-left: auto;
-  color: var(--accent);
-}
-
-.dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--accent);
-  animation: pulse 1.885s ease-in-out infinite;
-}
-
-@keyframes pulse {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.1;
-  }
 }
 
 .title,
@@ -154,61 +111,7 @@
   color: var(--text-muted);
 }
 
-.idle {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 4px 0 4px 4px;
-}
-
-.idleBody {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.idleText,
-.idleHint {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.idleText {
-  font-size: 16px;
-  line-height: 22px;
-  color: color-mix(in srgb, var(--text-strong) 60%, transparent);
-}
-
-.idleHint {
-  font-size: 14px;
-  line-height: 20px;
-  color: color-mix(in srgb, var(--text-strong) 42%, transparent);
-}
-
-.idleAction {
-  width: 44px;
-  height: 44px;
-  flex: none;
-  border-radius: var(--radius-sm);
-  color: var(--icon);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 150ms;
-}
-
-.idleLink:hover .idleAction {
-  background: rgb(255 255 255 / 0.06);
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .dot {
-    animation: none;
-  }
-
   .headTrack {
     transition: none;
   }
