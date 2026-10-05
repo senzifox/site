@@ -1,4 +1,4 @@
-import type { Terminal, TerminalRow } from "./types";
+import type { TerminalRow } from "./types";
 
 const title: TerminalRow = {
   type: "title",
@@ -25,7 +25,7 @@ const game: TerminalRow = {
 
 const push: TerminalRow = { type: "github", key: "push", user: "senzifox", idleText: "давно не пушил" };
 
-export const terminal: Terminal = {
+export const terminal = {
   main: [
     title,
     links,
@@ -87,4 +87,6 @@ export const terminal: Terminal = {
     { type: "blank" },
     { type: "palette" },
   ],
-};
+} satisfies Record<string, TerminalRow[]>;
+
+export type TerminalVariant = keyof typeof terminal;

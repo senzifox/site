@@ -26,13 +26,10 @@ const load = (user: string) => async () => {
   return latestPush((await response.json()) as Event[]);
 };
 
-const loaders = new Map<string, () => Promise<Fetched<GithubPush | null>>>();
+let loader: { user: string; get: () => Promise<Fetched<GithubPush | null>> } | null = null;
 
 export const getGithubPush = async (user: string) => {
-  let get = loaders.get(user);
-  if (!get) {
-    get = cached(load(user), { ttlMs: 600_000, errorTtlMs: 300_000 });
-    loaders.set(user, get);
-  }
-  return (await get()).data;
+  if (loader?.user !== user)
+    loader = { user, get: cached(load(user), { ttlMs: 600_000, errorTtlMs: 300_000 }) };
+  return (await loader.get()).data;
 };

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { terminal } from "@/content/terminal";
-import type { TerminalRow, TerminalVariant } from "@/content/types";
+import { type TerminalVariant, terminal } from "@/content/terminal";
+import type { TerminalRow } from "@/content/types";
 import { spotifyIdle } from "@/lib/spotify/types";
 import { toGame } from "@/lib/steam/steam";
 import { steamIdle } from "@/lib/steam/types";
@@ -14,7 +14,7 @@ const now = new Date("2026-10-05T12:00:00Z");
 const live: Live = {
   spotify: spotifyIdle,
   steam: steamIdle,
-  pushes: {},
+  github: null,
   uptime: 0,
   deploy: { sha: "abc1234", time: "2026-10-05T09:00:00Z" },
   now,
@@ -97,7 +97,7 @@ describe("renderTerminal", () => {
         durationMs: 1,
       },
       steam: { isPlaying: false, recent: toGame(570, "Dota 2") },
-      pushes: { fox: { repo: "fox/site", url: "", at: "2026-10-05T11:00:00Z" } },
+      github: { repo: "fox/site", url: "", at: "2026-10-05T11:00:00Z" },
       uptime: 3 * 3600,
     });
     expect(busy).toMatch(/music +band\n +song/);

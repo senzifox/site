@@ -8,7 +8,7 @@ import { fox } from "./fox";
 export type Live = {
   spotify: SpotifyNow;
   steam: SteamNow;
-  pushes: Record<string, GithubPush | null>;
+  github: GithubPush | null;
   uptime: number;
   deploy: { sha: string; time: string };
   now: Date;
@@ -35,8 +35,6 @@ const ART_WIDTH = Math.max(...fox.glyphs.map((line) => line.length));
 const INFO_WIDTH = SCREEN - ART_WIDTH - GAP;
 
 type Part = string | { items: string[]; separator: string };
-
-type Field = { key: string; parts: Part[]; mark?: string };
 
 const clip = (s: string, max: number) => (s.length > max ? `${s.slice(0, Math.max(0, max - 1))}…` : s);
 
@@ -79,45 +77,6 @@ const steam = (row: Extract<TerminalRow, { type: "steam" }>, now: SteamNow) => {
   return row.idleText;
 };
 
-const field = (row: TerminalRow, live: Live): Field | null => {
-  switch (row.type) {
-    case "text":
-      return { key: row.key, parts: [row.value] };
-    case "list":
-      return { key: row.key, parts: [{ items: row.items, separator: DOT_SEPARATOR }] };
-    case "links":
-      return { key: row.key, parts: [row.services.join(DOT_SEPARATOR), row.handle] };
-    case "status":
-      return { key: row.key, parts: [row.text], mark: paint(DOT[row.state ?? "online"], "●") };
-    case "clock":
-      return { key: row.key, parts: [formatClock(row.timeZone, live.now)] };
-    case "spotify":
-      return {
-        key: row.key,
-        parts: live.spotify.isPlaying
-          ? [{ items: live.spotify.artists, separator: ", " }, live.spotify.title]
-          : [row.idleText],
-      };
-    case "steam":
-      return { key: row.key, parts: [steam(row, live.steam)] };
-    case "github": {
-      const push = live.pushes[row.user];
-      return {
-        key: row.key,
-        parts: [
-          push ? `${push.repo.replace(`${row.user}/`, "")} · ${formatAgo(push.at, live.now)}` : row.idleText,
-        ],
-      };
-    }
-    case "uptime":
-      return { key: row.key, parts: [formatUptime(live.uptime)] };
-    case "deploy":
-      return { key: row.key, parts: [`${formatAgo(live.deploy.time, live.now)} · ${live.deploy.sha}`] };
-    default:
-      return null;
-  }
-};
-
 const palette = () =>
   Object.values(fox.palette)
     .map((rgb) => paint(rgb, "███"))
@@ -157,50 +116,79 @@ const compose = (info: string[]) => {
   return `${lines.join("\n")}\n`;
 };
 
-export function renderTerminal(rows: TerminalRow[], live: Live): string {
-  const fields = new Map(rows.map((row) => [row, field(row, live)]));
-  const keyLines = [...fields.values()].flatMap((f) => f?.key.split("\n") ?? []);
-  const width = Math.max(0, ...keyLines.map((line) => line.length));
+const keyWidth = (rows: TerminalRow[]) =>
+  Math.max(0, ...rows.flatMap((row) => ("key" in row ? row.key.split("\n") : [])).map((line) => line.length));
 
-  const kv = ({ key, parts, mark }: Field) => {
-    const keys = key.split("\n");
-    const room = INFO_WIDTH - width - 2 - (mark ? 2 : 0);
-    const lines = parts.flatMap((part) =>
-      typeof part === "string" ? [part] : pack(part.items, room, part.separator),
-    );
-    return Array.from({ length: Math.max(keys.length, lines.length) }, (_, i) => {
-      const prefix = mark ? (i === 0 ? `${mark} ` : "  ") : "";
-      return `${accent((keys[i] ?? "").padEnd(width))}  ${prefix}${clip(lines[i] ?? "", room)}`;
-    });
-  };
-
-  const info = rows.flatMap((row): string[] => {
-    const f = fields.get(row);
-    if (f) return kv(f);
-    switch (row.type) {
-      case "title": {
-        const subtitle = row.subtitle ? wrap(row.subtitle, INFO_WIDTH) : [];
-        const rule = Math.max(`${row.user}@${row.host}`.length, ...subtitle.map((line) => line.length));
-        return [
-          `${bold(strong(row.user))}${muted("@")}${accent(row.host)}`,
-          ...subtitle.map(muted),
-          dim("─".repeat(rule)),
-        ];
-      }
-      case "blank":
-        return [""];
-      case "palette":
-        return [palette()];
-      case "heading":
-        return [accent(clip(row.text, INFO_WIDTH))];
-      case "paragraph":
-        return wrap(row.text, INFO_WIDTH).map(muted);
-      case "bullet":
-        return [`${accent("›")} ${clip(row.text, INFO_WIDTH - 2)}`];
-      default:
-        return [];
-    }
+const kv = (width: number, key: string, parts: Part[], mark?: string) => {
+  const keys = key.split("\n");
+  const room = INFO_WIDTH - width - 2 - (mark ? 2 : 0);
+  const lines = parts.flatMap((part) =>
+    typeof part === "string" ? [part] : pack(part.items, room, part.separator),
+  );
+  return Array.from({ length: Math.max(keys.length, lines.length) }, (_, i) => {
+    const prefix = mark ? (i === 0 ? `${mark} ` : "  ") : "";
+    return `${accent((keys[i] ?? "").padEnd(width))}  ${prefix}${clip(lines[i] ?? "", room)}`;
   });
+};
 
-  return compose(info);
+const github = (row: Extract<TerminalRow, { type: "github" }>, live: Live) => {
+  const push = live.github;
+  return push ? `${push.repo.replace(`${row.user}/`, "")} · ${formatAgo(push.at, live.now)}` : row.idleText;
+};
+
+const lines = (row: TerminalRow, live: Live, width: number): string[] => {
+  switch (row.type) {
+    case "title": {
+      const subtitle = row.subtitle ? wrap(row.subtitle, INFO_WIDTH) : [];
+      const rule = Math.max(`${row.user}@${row.host}`.length, ...subtitle.map((line) => line.length));
+      return [
+        `${bold(strong(row.user))}${muted("@")}${accent(row.host)}`,
+        ...subtitle.map(muted),
+        dim("─".repeat(rule)),
+      ];
+    }
+    case "blank":
+      return [""];
+    case "palette":
+      return [palette()];
+    case "heading":
+      return [accent(clip(row.text, INFO_WIDTH))];
+    case "paragraph":
+      return wrap(row.text, INFO_WIDTH).map(muted);
+    case "bullet":
+      return [`${accent("›")} ${clip(row.text, INFO_WIDTH - 2)}`];
+    case "text":
+      return kv(width, row.key, [row.value]);
+    case "list":
+      return kv(width, row.key, [{ items: row.items, separator: DOT_SEPARATOR }]);
+    case "links":
+      return kv(width, row.key, [row.services.join(DOT_SEPARATOR), row.handle]);
+    case "status":
+      return kv(width, row.key, [row.text], paint(DOT[row.state ?? "online"], "●"));
+    case "clock":
+      return kv(width, row.key, [formatClock(row.timeZone, live.now)]);
+    case "spotify":
+      return kv(
+        width,
+        row.key,
+        live.spotify.isPlaying
+          ? [{ items: live.spotify.artists, separator: ", " }, live.spotify.title]
+          : [row.idleText],
+      );
+    case "steam":
+      return kv(width, row.key, [steam(row, live.steam)]);
+    case "github":
+      return kv(width, row.key, [github(row, live)]);
+    case "uptime":
+      return kv(width, row.key, [formatUptime(live.uptime)]);
+    case "deploy":
+      return kv(width, row.key, [`${formatAgo(live.deploy.time, live.now)} · ${live.deploy.sha}`]);
+    default:
+      return row satisfies never;
+  }
+};
+
+export function renderTerminal(rows: TerminalRow[], live: Live): string {
+  const width = keyWidth(rows);
+  return compose(rows.flatMap((row) => lines(row, live, width)));
 }

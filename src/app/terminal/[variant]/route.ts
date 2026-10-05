@@ -1,5 +1,5 @@
-import { terminal } from "@/content/terminal";
-import type { TerminalRow, TerminalVariant } from "@/content/types";
+import { type TerminalVariant, terminal } from "@/content/terminal";
+import type { TerminalRow } from "@/content/types";
 import { getGithubPush } from "@/lib/github/github";
 import { getSpotifyNow } from "@/lib/spotify/spotify";
 import { spotifyIdle } from "@/lib/spotify/types";
@@ -35,30 +35,23 @@ const within = async <T>(promise: Promise<T>, fallback: T) => {
 
 const isVariant = (value: string): value is TerminalVariant => Object.hasOwn(terminal, value);
 
-const pushes = async (rows: TerminalRow[]) => {
-  const users = [...new Set(rows.flatMap((row) => (row.type === "github" ? [row.user] : [])))];
-  const entries = await Promise.all(
-    users.map(async (user) => [user, await within(getGithubPush(user), null)] as const),
-  );
-  return Object.fromEntries(entries);
-};
-
 export async function GET(_request: Request, { params }: { params: Promise<{ variant: string }> }) {
   const { variant } = await params;
   if (!isVariant(variant)) return new Response("not found\n", { status: 404, headers });
 
   const rows = terminal[variant];
   const uses = (type: TerminalRow["type"]) => rows.some((row) => row.type === type);
-  const [spotify, steam, latest] = await Promise.all([
+  const [user] = rows.flatMap((row) => (row.type === "github" ? [row.user] : []));
+  const [spotify, steam, github] = await Promise.all([
     uses("spotify") ? within(getSpotifyNow(), spotifyIdle) : spotifyIdle,
     uses("steam") ? within(getSteamNow(), steamIdle) : steamIdle,
-    pushes(rows),
+    user ? within(getGithubPush(user), null) : null,
   ]);
 
   const body = renderTerminal(rows, {
     spotify,
     steam,
-    pushes: latest,
+    github,
     uptime: process.uptime(),
     deploy: { sha: process.env.BUILD_SHA ?? "dev", time: process.env.BUILD_TIME ?? new Date().toISOString() },
     now: new Date(),

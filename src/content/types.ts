@@ -75,7 +75,3 @@ export type TerminalRow =
   | { type: "github"; key: string; user: string; idleText: string }
   | { type: "uptime"; key: string }
   | { type: "deploy"; key: string };
-
-export type TerminalVariant = "main" | "short" | "full" | "about";
-
-export type Terminal = Record<TerminalVariant, TerminalRow[]>;
