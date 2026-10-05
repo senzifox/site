@@ -1,7 +1,7 @@
 export type Track = {
   isPlaying: true;
   title: string;
-  artist: string;
+  artists: string[];
   albumImageUrl: string;
   songUrl: string;
   progressMs: number;

@@ -40,7 +40,7 @@ describe("toNowSpotify", () => {
     expect(toNowSpotify(track)).toEqual({
       isPlaying: true,
       title: "Song",
-      artist: "A, B",
+      artists: ["A", "B"],
       albumImageUrl: "300",
       songUrl: "https://open.spotify.com/track/1",
       progressMs: 42_000,
@@ -60,7 +60,7 @@ describe("toNowSpotify", () => {
         show: { name: "Podcast", images: [] },
       },
     };
-    expect(toNowSpotify(episode)).toMatchObject({ isPlaying: true, title: "Episode", artist: "Podcast" });
+    expect(toNowSpotify(episode)).toMatchObject({ isPlaying: true, title: "Episode", artists: ["Podcast"] });
   });
 
   it("falls back to show artwork when the episode has none", () => {
@@ -90,7 +90,7 @@ describe("advance", () => {
   const playing = {
     isPlaying: true as const,
     title: "Song",
-    artist: "A",
+    artists: ["A"],
     albumImageUrl: "",
     songUrl: "",
     progressMs: 60_000,

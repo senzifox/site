@@ -1,4 +1,4 @@
-import type { Site, StatusState, TerminalRow } from "@/content/types";
+import type { StatusState, TerminalRow } from "@/content/types";
 import { formatAgo, formatUptime } from "@/lib/format";
 import type { Push } from "@/lib/github/push";
 import type { NowSpotify } from "@/lib/spotify/types";
@@ -34,9 +34,29 @@ const GAP = 3;
 const ART_WIDTH = Math.max(...fox.glyphs.map((line) => line.length));
 const INFO_WIDTH = SCREEN - ART_WIDTH - GAP;
 
-type Pair = { key: string; plain: string; colored?: string; mark?: string };
+type Part = string | { items: string[]; separator: string };
+
+type Field = { key: string; parts: Part[]; mark?: string };
 
 const clip = (s: string, max: number) => (s.length > max ? `${s.slice(0, Math.max(0, max - 1))}…` : s);
+
+const DOT_SEPARATOR = " · ";
+
+const pack = (items: string[], width: number, separator: string) => {
+  const tail = separator.trimEnd();
+  const lines: string[] = [];
+  let line = "";
+  for (const item of items) {
+    if (line && `${line}${separator}${item}`.length + tail.length > width) {
+      lines.push(`${line}${tail}`);
+      line = item;
+    } else {
+      line = line ? `${line}${separator}${item}` : item;
+    }
+  }
+  if (line) lines.push(line);
+  return lines;
+};
 
 const wrap = (text: string, width: number) => {
   const lines: string[] = [];
@@ -69,45 +89,40 @@ const steam = (row: Extract<TerminalRow, { type: "steam" }>, now: NowSteam) => {
   return row.idleText;
 };
 
-const pair = (row: TerminalRow, live: Live): Pair | null => {
+const field = (row: TerminalRow, live: Live): Field | null => {
   switch (row.type) {
     case "text":
-      return { key: row.key, plain: row.value };
+      return { key: row.key, parts: [row.value] };
     case "list":
-      return { key: row.key, plain: row.items.join(" · ") };
-    case "links": {
-      const word = row.word ?? "on";
-      const services = row.services.join(" · ");
-      return {
-        key: row.key,
-        plain: `${row.handle} ${word} ${services}`,
-        colored: `${strong(row.handle)} ${muted(word)} ${services}`,
-      };
-    }
+      return { key: row.key, parts: [{ items: row.items, separator: DOT_SEPARATOR }] };
+    case "links":
+      return { key: row.key, parts: [row.services.join(DOT_SEPARATOR), row.handle] };
     case "status":
-      return { key: row.key, plain: row.text, mark: paint(DOT[row.state ?? "online"], "●") };
+      return { key: row.key, parts: [row.text], mark: paint(DOT[row.state ?? "online"], "●") };
     case "clock":
-      return { key: row.key, plain: clock(row.timeZone) };
+      return { key: row.key, parts: [clock(row.timeZone)] };
     case "spotify":
       return {
         key: row.key,
-        plain: live.spotify.isPlaying ? `${live.spotify.title} — ${live.spotify.artist}` : row.idleText,
+        parts: live.spotify.isPlaying
+          ? [{ items: live.spotify.artists, separator: ", " }, live.spotify.title]
+          : [row.idleText],
       };
     case "steam":
-      return { key: row.key, plain: steam(row, live.steam) };
+      return { key: row.key, parts: [steam(row, live.steam)] };
     case "github": {
       const push = live.pushes[row.user];
       return {
         key: row.key,
-        plain: push
-          ? `${push.repo.replace(`${row.user}/`, "")} · ${formatAgo(push.at, live.now)}`
-          : row.idleText,
+        parts: [
+          push ? `${push.repo.replace(`${row.user}/`, "")} · ${formatAgo(push.at, live.now)}` : row.idleText,
+        ],
       };
     }
     case "uptime":
-      return { key: row.key, plain: formatUptime(live.uptime) };
+      return { key: row.key, parts: [formatUptime(live.uptime)] };
     case "deploy":
-      return { key: row.key, plain: `${formatAgo(live.deploy.time, live.now)} · ${live.deploy.sha}` };
+      return { key: row.key, parts: [`${formatAgo(live.deploy.time, live.now)} · ${live.deploy.sha}`] };
     default:
       return null;
   }
@@ -152,27 +167,36 @@ const compose = (info: string[]) => {
   return `${lines.join("\n")}\n`;
 };
 
-export function renderTerminal(site: Site, rows: TerminalRow[], live: Live): string {
-  const pairs = new Map(rows.map((row) => [row, pair(row, live)]));
-  const width = Math.max(0, ...[...pairs.values()].map((p) => p?.key.length ?? 0));
-  const { name } = site.header;
-  const host = new URL(site.meta.url).host;
+export function renderTerminal(rows: TerminalRow[], live: Live): string {
+  const fields = new Map(rows.map((row) => [row, field(row, live)]));
+  const keyLines = [...fields.values()].flatMap((f) => f?.key.split("\n") ?? []);
+  const width = Math.max(0, ...keyLines.map((line) => line.length));
 
-  const kv = ({ key, plain, colored, mark }: Pair) => {
+  const kv = ({ key, parts, mark }: Field) => {
+    const keys = key.split("\n");
     const room = INFO_WIDTH - width - 2 - (mark ? 2 : 0);
-    const value = plain.length > room ? clip(plain, room) : (colored ?? plain);
-    return `${accent(key.padEnd(width))}  ${mark ? `${mark} ` : ""}${value}`;
+    const lines = parts.flatMap((part) =>
+      typeof part === "string" ? [part] : pack(part.items, room, part.separator),
+    );
+    return Array.from({ length: Math.max(keys.length, lines.length) }, (_, i) => {
+      const prefix = mark ? (i === 0 ? `${mark} ` : "  ") : "";
+      return `${accent((keys[i] ?? "").padEnd(width))}  ${prefix}${clip(lines[i] ?? "", room)}`;
+    });
   };
 
   const info = rows.flatMap((row): string[] => {
-    const p = pairs.get(row);
-    if (p) return [kv(p)];
+    const f = fields.get(row);
+    if (f) return kv(f);
     switch (row.type) {
-      case "title":
+      case "title": {
+        const subtitle = row.subtitle ? wrap(row.subtitle, INFO_WIDTH) : [];
+        const rule = Math.max(`${row.user}@${row.host}`.length, ...subtitle.map((line) => line.length));
         return [
-          `${bold(strong(name))}${muted("@")}${accent(host)}`,
-          dim("─".repeat(`${name}@${host}`.length)),
+          `${bold(strong(row.user))}${muted("@")}${accent(row.host)}`,
+          ...subtitle.map(muted),
+          dim("─".repeat(rule)),
         ];
+      }
       case "blank":
         return [""];
       case "palette":

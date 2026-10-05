@@ -80,13 +80,13 @@ export function NowSpotify({ label, idleText, idleHint, href }: NowSpotifyBlock)
                   <Icon name="spotify" size={14} className={styles.liveLogo} />
                 </span>
                 <span className={styles.title}>{state.track.title}</span>
-                <span className={styles.artist}>{state.track.artist}</span>
+                <span className={styles.artist}>{state.track.artists.join(", ")}</span>
               </div>
               <div className={styles.progress}>
                 <Waveform
                   key={
                     state.track.songUrl ||
-                    `${state.track.title}:${state.track.artist}:${state.track.durationMs}`
+                    `${state.track.title}:${state.track.artists.join(", ")}:${state.track.durationMs}`
                   }
                   progress={state.progressMs / state.track.durationMs}
                 />

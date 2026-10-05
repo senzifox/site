@@ -83,12 +83,16 @@ const colors = art.map((line, row) =>
 );
 
 const glyphs = art.map((line) => line.join(""));
+const usage = (key: Key) => colors.join("").split(key).length - 1;
+const palette = Object.fromEntries(
+  [...ALL].sort((a, b) => usage(b) - usage(a)).map((key) => [key, PALETTE[key]]),
+);
 const list = (lines: string[]) => lines.map((line) => `    ${JSON.stringify(line)},`).join("\n");
 
 await writeFile(
   out,
   `export const fox = {
-  palette: ${JSON.stringify(PALETTE)},
+  palette: ${JSON.stringify(palette)},
   glyphs: [
 ${list(glyphs)}
   ],

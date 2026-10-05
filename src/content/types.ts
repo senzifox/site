@@ -59,7 +59,7 @@ export type Site = {
 };
 
 export type TerminalRow =
-  | { type: "title" }
+  | { type: "title"; user: string; host: string; subtitle?: string }
   | { type: "blank" }
   | { type: "palette" }
   | { type: "heading"; text: string }
@@ -67,7 +67,7 @@ export type TerminalRow =
   | { type: "bullet"; text: string }
   | { type: "text"; key: string; value: string }
   | { type: "list"; key: string; items: string[] }
-  | { type: "links"; key: string; handle: string; services: string[]; word?: string }
+  | { type: "links"; key: string; handle: string; services: string[] }
   | { type: "status"; key: string; text: string; state?: StatusState }
   | { type: "clock"; key: string; timeZone: string }
   | { type: "spotify"; key: string; idleText: string }

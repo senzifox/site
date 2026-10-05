@@ -51,7 +51,7 @@ export const toNowSpotify = (payload: CurrentlyPlaying | null): NowSpotify => {
     return {
       isPlaying: true,
       title: item.name,
-      artist: item.show?.name ?? "",
+      artists: item.show?.name ? [item.show.name] : [],
       albumImageUrl: pickImage(item.images?.length ? item.images : (item.show?.images ?? [])),
       songUrl: item.external_urls.spotify ?? "",
       progressMs: payload.progress_ms ?? 0,
@@ -64,7 +64,7 @@ export const toNowSpotify = (payload: CurrentlyPlaying | null): NowSpotify => {
   return {
     isPlaying: true,
     title: item.name,
-    artist: (item.artists ?? []).map((artist) => artist.name).join(", "),
+    artists: (item.artists ?? []).map((artist) => artist.name),
     albumImageUrl: pickImage(item.album?.images ?? []),
     songUrl: item.external_urls.spotify ?? "",
     progressMs: payload.progress_ms ?? 0,

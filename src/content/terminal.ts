@@ -22,7 +22,7 @@ const push: TerminalRow = { type: "github", key: "push", user: "senzifox", idleT
 
 export const terminal: Terminal = {
   main: [
-    { type: "title" },
+    { type: "title", user: "сензи", host: "senzi.dev" },
     role,
     links,
     { type: "list", key: "stack", items: ["docker", "nginx", "ci/cd", "linux"] },
@@ -37,7 +37,7 @@ export const terminal: Terminal = {
   ],
 
   short: [
-    { type: "title" },
+    { type: "title", user: "сензи", host: "senzi.dev" },
     { type: "paragraph", text: "jr devops · moscow" },
     { type: "blank" },
     { type: "bullet", text: "t.me/senzifox" },
@@ -48,7 +48,7 @@ export const terminal: Terminal = {
   ],
 
   full: [
-    { type: "title" },
+    { type: "title", user: "сензи", host: "senzi.dev" },
     role,
     { type: "clock", key: "time", timeZone: "Europe/Moscow" },
     music,
@@ -66,7 +66,7 @@ export const terminal: Terminal = {
   ],
 
   about: [
-    { type: "title" },
+    { type: "title", user: "сензи", host: "senzi.dev" },
     { type: "paragraph", text: "jr devops · moscow" },
     { type: "blank" },
     {

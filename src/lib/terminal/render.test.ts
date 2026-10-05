@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-import { site } from "@/content/site";
 import { terminal } from "@/content/terminal";
 import type { TerminalRow, TerminalVariant } from "@/content/types";
 import { spotifyIdle } from "@/lib/spotify/types";
@@ -21,19 +20,54 @@ const live: Live = {
   now,
 };
 
+const infoColumn = Math.max(...fox.glyphs.map((line) => line.length)) + 3;
+
 const render = (rows: TerminalRow[], overrides: Partial<Live> = {}) =>
-  plain(renderTerminal(site, rows, { ...live, ...overrides })).join("\n");
+  plain(renderTerminal(rows, { ...live, ...overrides }))
+    .map((line) => line.slice(infoColumn))
+    .join("\n");
 
 describe("renderTerminal", () => {
   it.each(Object.keys(terminal) as TerminalVariant[])("%s fits an 80x24 terminal", (variant) => {
-    const lines = plain(renderTerminal(site, terminal[variant], live));
+    const lines = plain(renderTerminal(terminal[variant], live));
     expect(lines.length).toBeLessThanOrEqual(fox.glyphs.length);
     for (const line of lines) expect(line.length).toBeLessThanOrEqual(80);
   });
 
-  it("merges socials into one links row", () => {
-    const output = render([{ type: "links", key: "find me", handle: "@fox", services: ["tg", "gh"] }]);
-    expect(output).toMatch(/find me {2}@fox on tg · gh/);
+  it("splits a key over lines and keeps the value column", () => {
+    const output = render([
+      { type: "links", key: "find -\nme on", handle: "@fox", services: ["tg", "gh"] },
+      { type: "uptime", key: "uptime" },
+    ]);
+    expect(output).toMatch(/find - {2}tg · gh\nme on {3}@fox\nuptime {2}0m/);
+  });
+
+  it("wraps list items onto the value column", () => {
+    const items = ["docker", "nginx", "ci/cd", "linux", "python", "bash", "git", "kubernetes"];
+    const output = render([{ type: "list", key: "stack", items }]);
+    expect(output).toMatch(
+      /stack {2}docker · nginx · ci\/cd · linux ·\n {7}python · bash · git · kubernetes/,
+    );
+  });
+
+  it("wraps artists keeping the comma at the end of the line", () => {
+    const output = render([{ type: "spotify", key: "music", idleText: "" }], {
+      spotify: {
+        isPlaying: true,
+        title: "song",
+        artists: ["first artist", "second artist", "third artist"],
+        albumImageUrl: "",
+        songUrl: "",
+        progressMs: 0,
+        durationMs: 1,
+      },
+    });
+    expect(output).toMatch(/music {2}first artist, second artist,\n {7}third artist\n {7}song/);
+  });
+
+  it("shows the subtitle under the title", () => {
+    const output = render([{ type: "title", user: "fox", host: "den", subtitle: "jr devops" }]);
+    expect(output).toMatch(/^fox@den\njr devops\n─{9}$/m);
   });
 
   it("shows live data with idle fallbacks", () => {
@@ -56,7 +90,7 @@ describe("renderTerminal", () => {
       spotify: {
         isPlaying: true,
         title: "song",
-        artist: "band",
+        artists: ["band"],
         albumImageUrl: "",
         songUrl: "",
         progressMs: 0,
@@ -66,7 +100,7 @@ describe("renderTerminal", () => {
       pushes: { fox: { repo: "fox/site", url: "", at: "2026-10-05T11:00:00Z" } },
       uptime: 3 * 3600,
     });
-    expect(busy).toMatch(/music\s+song — band/);
+    expect(busy).toMatch(/music +band\n +song/);
     expect(busy).toMatch(/game\s+недавно: Dota 2/);
     expect(busy).toMatch(/push\s+site · 1 час назад/);
     expect(busy).toMatch(/uptime\s+3h 0m/);

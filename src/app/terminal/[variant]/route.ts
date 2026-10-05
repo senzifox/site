@@ -1,4 +1,3 @@
-import { site } from "@/content/site";
 import { terminal } from "@/content/terminal";
 import type { TerminalRow, TerminalVariant } from "@/content/types";
 import { getLatestPush } from "@/lib/github/push";
@@ -56,7 +55,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ var
     pushes(rows),
   ]);
 
-  const body = renderTerminal(site, rows, {
+  const body = renderTerminal(rows, {
     spotify,
     steam,
     pushes: latest,
