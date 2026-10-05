@@ -11,6 +11,7 @@
   align-items: center;
   justify-content: center;
   color: var(--accent);
+  cursor: pointer;
   transition:
     background 200ms,
     transform 200ms;
@@ -19,4 +20,8 @@
 .link:hover {
   background: color-mix(in srgb, var(--accent) 14%, transparent);
   transform: translateY(-2px);
+}
+
+.copied {
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
 }

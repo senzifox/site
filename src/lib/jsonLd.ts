@@ -13,7 +13,7 @@ export function personJsonLd() {
       url,
       description,
       image: new URL("/avatar.webp", url).toString(),
-      sameAs: socials.map((social) => social.href),
+      sameAs: socials.flatMap((social) => ("href" in social ? [social.href] : [])),
     },
   };
 }

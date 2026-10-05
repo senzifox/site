@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Icon } from "@/components/Icon/Icon";
+import type { IconName } from "@/components/Icon/icons";
 import { stripWhitespace } from "@/lib/format";
 
 const COPIED_MS = 1400;
@@ -20,9 +21,16 @@ const copyText = async (text: string) => {
   if (!copied) throw new Error("copy failed");
 };
 
-type Props = { value: string; className: string; copiedClassName: string };
+type Props = {
+  value: string;
+  className: string;
+  copiedClassName: string;
+  icon?: IconName;
+  size?: number;
+  label?: string;
+};
 
-export function CopyButton({ value, className, copiedClassName }: Props) {
+export function CopyButton({ value, className, copiedClassName, icon = "copy", size = 20, label }: Props) {
   const [copied, setCopied] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
@@ -44,9 +52,9 @@ export function CopyButton({ value, className, copiedClassName }: Props) {
       type="button"
       className={copied ? `${className} ${copiedClassName}` : className}
       onClick={copy}
-      aria-label={copied ? "copied" : "copy to clipboard"}
+      aria-label={copied ? "copied" : label ? `copy ${label}` : "copy to clipboard"}
     >
-      <Icon name={copied ? "check" : "copy"} size={20} />
+      <Icon name={copied ? "check" : icon} size={size} />
     </button>
   );
 }

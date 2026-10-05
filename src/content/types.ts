@@ -1,6 +1,6 @@
 import type { IconName } from "@/components/Icon/icons";
 
-export type Social = { icon: IconName; label: string; href: string };
+export type Social = { icon: IconName; label: string } & ({ href: string } | { copy: string });
 
 export type NowSpotifyBlock = {
   type: "nowSpotify";

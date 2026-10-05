@@ -5,6 +5,7 @@ export const iconSources = {
   steam: "simple-icons:steam",
   github: "simple-icons:github",
   spotify: "simple-icons:spotify",
+  discord: "simple-icons:discord",
   mail: "material-symbols:mail-rounded",
   card: "material-symbols:credit-card-rounded",
   usdt: "simple-icons:tether",
