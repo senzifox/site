@@ -5,13 +5,13 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: "dispatch default"
+        description: "image tag to redeploy or roll back to; empty builds and deploys the current commit"
         required: false
         default: ""
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 permissions:
   contents: read
@@ -19,7 +19,7 @@ permissions:
 jobs:
   check:
     if: github.event_name == 'push' || inputs.tag == ''
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6
@@ -37,7 +37,7 @@ jobs:
   image:
     needs: check
     if: github.ref == 'refs/heads/main'
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
