@@ -20,6 +20,8 @@ wait_healthy() {
 docker pull "$IMAGE" || docker image inspect "$IMAGE" >/dev/null
 if docker compose up -d --remove-orphans && wait_healthy; then
   echo "Deployed $IMAGE"
+  docker image ls "${IMAGE%:*}" --format '{{.Repository}}:{{.Tag}}' |
+    grep -vxF -e "$IMAGE" -e "${previous:-}" | xargs -r docker image rm >/dev/null 2>&1 || true
   docker image prune -f >/dev/null
   exit 0
 fi
