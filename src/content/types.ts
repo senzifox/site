@@ -57,3 +57,25 @@ export type Site = {
   blocks: Block[];
   footer?: { text: string; href?: string };
 };
+
+export type TerminalRow =
+  | { type: "title" }
+  | { type: "blank" }
+  | { type: "palette" }
+  | { type: "heading"; text: string }
+  | { type: "paragraph"; text: string }
+  | { type: "bullet"; text: string }
+  | { type: "text"; key: string; value: string }
+  | { type: "list"; key: string; items: string[] }
+  | { type: "links"; key: string; handle: string; services: string[]; word?: string }
+  | { type: "status"; key: string; text: string; state?: StatusState }
+  | { type: "clock"; key: string; timeZone: string }
+  | { type: "spotify"; key: string; idleText: string }
+  | { type: "steam"; key: string; idleText: string; recentText?: string }
+  | { type: "github"; key: string; user: string; idleText: string }
+  | { type: "uptime"; key: string }
+  | { type: "deploy"; key: string };
+
+export type TerminalVariant = "main" | "short" | "full" | "about";
+
+export type Terminal = Record<TerminalVariant, TerminalRow[]>;
