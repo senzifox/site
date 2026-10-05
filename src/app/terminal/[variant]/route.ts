@@ -1,9 +1,9 @@
 import { terminal } from "@/content/terminal";
 import type { TerminalRow, TerminalVariant } from "@/content/types";
-import { getLatestPush } from "@/lib/github/push";
-import { getNowSpotify } from "@/lib/spotify/spotify";
+import { getGithubPush } from "@/lib/github/github";
+import { getSpotifyNow } from "@/lib/spotify/spotify";
 import { spotifyIdle } from "@/lib/spotify/types";
-import { getNowSteam } from "@/lib/steam/steam";
+import { getSteamNow } from "@/lib/steam/steam";
 import { steamIdle } from "@/lib/steam/types";
 import { renderTerminal } from "@/lib/terminal/render";
 
@@ -38,7 +38,7 @@ const isVariant = (value: string): value is TerminalVariant => Object.hasOwn(ter
 const pushes = async (rows: TerminalRow[]) => {
   const users = [...new Set(rows.flatMap((row) => (row.type === "github" ? [row.user] : [])))];
   const entries = await Promise.all(
-    users.map(async (user) => [user, await within(getLatestPush(user), null)] as const),
+    users.map(async (user) => [user, await within(getGithubPush(user), null)] as const),
   );
   return Object.fromEntries(entries);
 };
@@ -50,8 +50,8 @@ export async function GET(_request: Request, { params }: { params: Promise<{ var
   const rows = terminal[variant];
   const uses = (type: TerminalRow["type"]) => rows.some((row) => row.type === type);
   const [spotify, steam, latest] = await Promise.all([
-    uses("spotify") ? within(getNowSpotify(), spotifyIdle) : spotifyIdle,
-    uses("steam") ? within(getNowSteam(), steamIdle) : steamIdle,
+    uses("spotify") ? within(getSpotifyNow(), spotifyIdle) : spotifyIdle,
+    uses("steam") ? within(getSteamNow(), steamIdle) : steamIdle,
     pushes(rows),
   ]);
 

@@ -1,15 +1,15 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { type NowSpotify, spotifyIdle } from "@/lib/spotify/types";
+import { type SpotifyNow, spotifyIdle } from "@/lib/spotify/types";
 
 const POLL_MS = 15_000;
 const TICK_MS = 1_000;
 const TRACK_END_GRACE_MS = 1_500;
 
-type Snapshot = { data: NowSpotify; receivedAt: number };
+type Snapshot = { data: SpotifyNow; receivedAt: number };
 
-export function useNowSpotify() {
+export function useSpotify() {
   const [snapshot, setSnapshot] = useState<Snapshot | null>(null);
   const [now, setNow] = useState(() => Date.now());
   const inFlight = useRef<AbortController | null>(null);
@@ -19,9 +19,9 @@ export function useNowSpotify() {
     const controller = new AbortController();
     inFlight.current = controller;
     try {
-      const response = await fetch("/api/now-spotify", { cache: "no-store", signal: controller.signal });
-      if (!response.ok) throw new Error(`now-spotify ${response.status}`);
-      const data = (await response.json()) as NowSpotify;
+      const response = await fetch("/api/spotify", { cache: "no-store", signal: controller.signal });
+      if (!response.ok) throw new Error(`spotify ${response.status}`);
+      const data = (await response.json()) as SpotifyNow;
       if (controller.signal.aborted) return;
       setSnapshot({ data, receivedAt: Date.now() });
     } catch {

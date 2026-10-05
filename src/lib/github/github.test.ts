@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { latestPush } from "./push";
+import { latestPush } from "./github";
 
 describe("latestPush", () => {
   it("takes the newest push event", () => {

@@ -1,12 +1,12 @@
 import { cached, type Fetched } from "@/lib/cache";
 
-export type Push = { repo: string; url: string; at: string };
+export type GithubPush = { repo: string; url: string; at: string };
 
 const TIMEOUT_MS = 3_000;
 
 type Event = { type: string; repo: { name: string }; created_at: string };
 
-export const latestPush = (events: Event[]): Push | null => {
+export const latestPush = (events: Event[]): GithubPush | null => {
   const push = events.find((event) => event.type === "PushEvent");
   return push
     ? { repo: push.repo.name, url: `https://github.com/${push.repo.name}`, at: push.created_at }
@@ -26,9 +26,9 @@ const load = (user: string) => async () => {
   return latestPush((await response.json()) as Event[]);
 };
 
-const loaders = new Map<string, () => Promise<Fetched<Push | null>>>();
+const loaders = new Map<string, () => Promise<Fetched<GithubPush | null>>>();
 
-export const getLatestPush = async (user: string) => {
+export const getGithubPush = async (user: string) => {
   let get = loaders.get(user);
   if (!get) {
     get = cached(load(user), { ttlMs: 600_000, errorTtlMs: 300_000 });

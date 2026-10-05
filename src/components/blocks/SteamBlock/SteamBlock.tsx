@@ -5,10 +5,10 @@ import { useState } from "react";
 import { Badge } from "@/components/Badge/Badge";
 import { cardClass } from "@/components/Card/Card";
 import { Icon } from "@/components/Icon/Icon";
-import type { NowSteamBlock } from "@/content/types";
+import type { SteamBlock as Props } from "@/content/types";
 import type { Game } from "@/lib/steam/types";
-import styles from "./NowSteam.module.css";
-import { useNowSteam } from "./useNowSteam";
+import styles from "./SteamBlock.module.css";
+import { useSteam } from "./useSteam";
 
 const fade = {
   initial: { opacity: 0 },
@@ -42,8 +42,8 @@ function Row({ href, children }: { href?: string; children: React.ReactNode }) {
   );
 }
 
-export function NowSteam({ label, idleText, idleHint, recentHint, href }: NowSteamBlock) {
-  const state = useNowSteam();
+export function SteamBlock({ label, idleText, idleHint, recentHint, href }: Props) {
+  const state = useSteam();
   const recent = state.status === "idle" ? state.recent : null;
   const hint = recent && recentHint ? recentHint.replace("{game}", recent.name) : idleHint;
 

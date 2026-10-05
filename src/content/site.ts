@@ -53,14 +53,14 @@ export const site: Site = {
       text: "",
     },
     {
-      type: "nowSpotify",
+      type: "spotify",
       label: "сейчас играет",
       idleText: "сейчас ничего не играет(",
       idleHint: "но ты можешь перейти на профиль",
       href: "https://open.spotify.com/user/31t4toue4cqdpnzamugmuj5pwkqe?si=7d0fa44dc4d645e5",
     },
     {
-      type: "nowSteam",
+      type: "steam",
       label: "сейчас играю",
       idleText: "сейчас ни во что не играю",
       idleHint: "но ты можешь перейти на профиль",

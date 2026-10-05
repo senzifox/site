@@ -1,4 +1,4 @@
-export type Track = {
+type Playing = {
   isPlaying: true;
   title: string;
   artists: string[];
@@ -8,6 +8,6 @@ export type Track = {
   durationMs: number;
 };
 
-export type NowSpotify = Track | { isPlaying: false };
+export type SpotifyNow = Playing | { isPlaying: false };
 
-export const spotifyIdle: NowSpotify = { isPlaying: false };
+export const spotifyIdle: SpotifyNow = { isPlaying: false };

@@ -1,14 +1,14 @@
 import type { StatusState, TerminalRow } from "@/content/types";
 import { formatAgo, formatUptime } from "@/lib/format";
-import type { Push } from "@/lib/github/push";
-import type { NowSpotify } from "@/lib/spotify/types";
-import type { NowSteam } from "@/lib/steam/types";
+import type { GithubPush } from "@/lib/github/github";
+import type { SpotifyNow } from "@/lib/spotify/types";
+import type { SteamNow } from "@/lib/steam/types";
 import { fox } from "./fox";
 
 export type Live = {
-  spotify: NowSpotify;
-  steam: NowSteam;
-  pushes: Record<string, Push | null>;
+  spotify: SpotifyNow;
+  steam: SteamNow;
+  pushes: Record<string, GithubPush | null>;
   uptime: number;
   deploy: { sha: string; time: string };
   now: Date;
@@ -83,7 +83,7 @@ const clock = (timeZone: string) => {
   }
 };
 
-const steam = (row: Extract<TerminalRow, { type: "steam" }>, now: NowSteam) => {
+const steam = (row: Extract<TerminalRow, { type: "steam" }>, now: SteamNow) => {
   if (now.isPlaying) return now.game.name;
   if (now.recent && row.recentText) return row.recentText.replace("{game}", now.recent.name);
   return row.idleText;

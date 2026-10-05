@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { advance, pickImage, toNowSpotify } from "./spotify";
+import { advance, pickImage, toSpotifyNow } from "./spotify";
 
 const images = [
   { url: "640", width: 640 },
@@ -22,7 +22,7 @@ describe("pickImage", () => {
   });
 });
 
-describe("toNowSpotify", () => {
+describe("toSpotifyNow", () => {
   const track = {
     is_playing: true,
     progress_ms: 42_000,
@@ -37,7 +37,7 @@ describe("toNowSpotify", () => {
   };
 
   it("maps a playing track", () => {
-    expect(toNowSpotify(track)).toEqual({
+    expect(toSpotifyNow(track)).toEqual({
       isPlaying: true,
       title: "Song",
       artists: ["A", "B"],
@@ -60,7 +60,7 @@ describe("toNowSpotify", () => {
         show: { name: "Podcast", images: [] },
       },
     };
-    expect(toNowSpotify(episode)).toMatchObject({ isPlaying: true, title: "Episode", artists: ["Podcast"] });
+    expect(toSpotifyNow(episode)).toMatchObject({ isPlaying: true, title: "Episode", artists: ["Podcast"] });
   });
 
   it("falls back to show artwork when the episode has none", () => {
@@ -75,14 +75,14 @@ describe("toNowSpotify", () => {
         show: { name: "Podcast", images: [{ url: "show", width: 300 }] },
       },
     };
-    expect(toNowSpotify(episode)).toMatchObject({ albumImageUrl: "show", songUrl: "" });
+    expect(toSpotifyNow(episode)).toMatchObject({ albumImageUrl: "show", songUrl: "" });
   });
 
   it("is idle when paused, empty, or an ad", () => {
-    expect(toNowSpotify(null)).toEqual({ isPlaying: false });
-    expect(toNowSpotify({ ...track, is_playing: false })).toEqual({ isPlaying: false });
-    expect(toNowSpotify({ ...track, item: null })).toEqual({ isPlaying: false });
-    expect(toNowSpotify({ ...track, currently_playing_type: "ad" })).toEqual({ isPlaying: false });
+    expect(toSpotifyNow(null)).toEqual({ isPlaying: false });
+    expect(toSpotifyNow({ ...track, is_playing: false })).toEqual({ isPlaying: false });
+    expect(toSpotifyNow({ ...track, item: null })).toEqual({ isPlaying: false });
+    expect(toSpotifyNow({ ...track, currently_playing_type: "ad" })).toEqual({ isPlaying: false });
   });
 });
 

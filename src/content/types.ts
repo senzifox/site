@@ -2,16 +2,16 @@ import type { IconName } from "@/components/Icon/icons";
 
 export type Social = { icon: IconName; label: string } & ({ href: string } | { copy: string });
 
-export type NowSpotifyBlock = {
-  type: "nowSpotify";
+export type SpotifyBlock = {
+  type: "spotify";
   label: string;
   idleText: string;
   idleHint?: string;
   href?: string;
 };
 
-export type NowSteamBlock = {
-  type: "nowSteam";
+export type SteamBlock = {
+  type: "steam";
   label: string;
   idleText: string;
   idleHint?: string;
@@ -36,8 +36,8 @@ export type StatusBlock = { type: "status"; label?: string; text: string; state?
 export type ClockBlock = { type: "clock"; label?: string; timeZone: string };
 
 export type Block =
-  | NowSpotifyBlock
-  | NowSteamBlock
+  | SpotifyBlock
+  | SteamBlock
   | TextBlock
   | CopyBlock
   | LinkBlock

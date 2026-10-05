@@ -1,23 +1,23 @@
 import { describe, expect, it } from "vitest";
-import { toGame, toNowSteam } from "./steam";
+import { toGame, toSteamNow } from "./steam";
 
-describe("toNowSteam", () => {
+describe("toSteamNow", () => {
   it("maps the game being played", () => {
-    expect(toNowSteam({ gameid: "570", gameextrainfo: "Dota 2" }, undefined)).toEqual({
+    expect(toSteamNow({ gameid: "570", gameextrainfo: "Dota 2" }, undefined)).toEqual({
       isPlaying: true,
       game: toGame("570", "Dota 2"),
     });
   });
 
   it("falls back to the most recent game", () => {
-    expect(toNowSteam({}, { appid: 730, name: "Counter-Strike 2" })).toEqual({
+    expect(toSteamNow({}, { appid: 730, name: "Counter-Strike 2" })).toEqual({
       isPlaying: false,
       recent: toGame(730, "Counter-Strike 2"),
     });
   });
 
   it("is idle without any game", () => {
-    expect(toNowSteam(undefined, undefined)).toEqual({ isPlaying: false, recent: null });
+    expect(toSteamNow(undefined, undefined)).toEqual({ isPlaying: false, recent: null });
   });
 });
 

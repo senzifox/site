@@ -1,5 +1,5 @@
 import { cached } from "@/lib/cache";
-import { type NowSpotify, spotifyIdle } from "./types";
+import { type SpotifyNow, spotifyIdle } from "./types";
 
 type Image = { url: string; width: number | null };
 
@@ -28,7 +28,7 @@ export const pickImage = (images: Image[], target = COVER_TARGET_WIDTH) => {
   return (sorted.find((image) => (image.width ?? 0) >= target) ?? sorted.at(-1))?.url ?? "";
 };
 
-export const advance = (data: NowSpotify, elapsedMs: number): NowSpotify =>
+export const advance = (data: SpotifyNow, elapsedMs: number): SpotifyNow =>
   data.isPlaying
     ? { ...data, progressMs: Math.min(data.durationMs, data.progressMs + Math.max(0, elapsedMs)) }
     : data;
@@ -43,7 +43,7 @@ class SpotifyError extends Error {
   }
 }
 
-export const toNowSpotify = (payload: CurrentlyPlaying | null): NowSpotify => {
+export const toSpotifyNow = (payload: CurrentlyPlaying | null): SpotifyNow => {
   const item = payload?.item;
   if (!payload?.is_playing || !item) return spotifyIdle;
 
@@ -106,7 +106,7 @@ const accessToken = async ({ clientId, clientSecret, refreshToken }: Credentials
   return token.value;
 };
 
-const loadNowSpotify = async (): Promise<NowSpotify> => {
+const loadSpotifyNow = async (): Promise<SpotifyNow> => {
   const credentials = readCredentials();
   if (!credentials) return spotifyIdle;
 
@@ -125,12 +125,12 @@ const loadNowSpotify = async (): Promise<NowSpotify> => {
   if (response.status === 204) return spotifyIdle;
   if (!response.ok) throw new SpotifyError("player", response);
 
-  return toNowSpotify((await response.json()) as CurrentlyPlaying);
+  return toSpotifyNow((await response.json()) as CurrentlyPlaying);
 };
 
-const loadCached = cached(loadNowSpotify, { ttlMs: 10_000, errorTtlMs: 5_000 });
+const loadCached = cached(loadSpotifyNow, { ttlMs: 10_000, errorTtlMs: 5_000 });
 
-export const getNowSpotify = async () => {
+export const getSpotifyNow = async () => {
   const { data, fetchedAt } = await loadCached();
   return advance(data, Date.now() - fetchedAt);
 };
