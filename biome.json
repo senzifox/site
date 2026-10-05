@@ -12,7 +12,8 @@
       "!next-env.d.ts",
       "!src/components/Avatar/silhouette.ts",
       "!src/components/Footer/tail.ts",
-      "!src/components/Icon/icons.ts"
+      "!src/components/Icon/icons.ts",
+      "!src/lib/terminal/fox.ts"
     ]
   },
   "formatter": {
