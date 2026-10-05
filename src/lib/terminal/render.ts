@@ -1,5 +1,5 @@
 import type { StatusState, TerminalRow } from "@/content/types";
-import { formatAgo, formatUptime } from "@/lib/format";
+import { formatAgo, formatClock, formatUptime } from "@/lib/format";
 import type { GithubPush } from "@/lib/github/github";
 import type { SpotifyNow } from "@/lib/spotify/types";
 import { fillGame, type SteamNow } from "@/lib/steam/types";
@@ -73,16 +73,6 @@ const wrap = (text: string, width: number) => {
   return lines;
 };
 
-const clock = (timeZone: string) => {
-  try {
-    return new Intl.DateTimeFormat("ru-RU", { timeZone, hour: "2-digit", minute: "2-digit" }).format(
-      new Date(),
-    );
-  } catch {
-    return "";
-  }
-};
-
 const steam = (row: Extract<TerminalRow, { type: "steam" }>, now: SteamNow) => {
   if (now.isPlaying) return now.game.name;
   if (now.recent && row.recentText) return fillGame(row.recentText, now.recent.name);
@@ -100,7 +90,7 @@ const field = (row: TerminalRow, live: Live): Field | null => {
     case "status":
       return { key: row.key, parts: [row.text], mark: paint(DOT[row.state ?? "online"], "●") };
     case "clock":
-      return { key: row.key, parts: [clock(row.timeZone)] };
+      return { key: row.key, parts: [formatClock(row.timeZone, live.now)] };
     case "spotify":
       return {
         key: row.key,

@@ -6,3 +6,18 @@
   -webkit-backdrop-filter: blur(14px);
   border-radius: var(--radius-card);
 }
+
+.padded {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.label {
+  margin: 0;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+  color: var(--accent);
+}
