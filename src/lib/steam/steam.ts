@@ -1,4 +1,5 @@
 import { cached } from "@/lib/cache";
+import { fetchJson } from "@/lib/http";
 import { type Game, type SteamNow, steamIdle } from "./types";
 
 type Summary = { gameid?: string; gameextrainfo?: string };
@@ -7,7 +8,6 @@ type Recent = { appid: number; name: string };
 
 const API = "https://api.steampowered.com";
 const STEAM_ID = /^\d{17}$/;
-const TIMEOUT_MS = 3_000;
 
 export const toGame = (appId: string | number, name: string): Game => ({
   name,
@@ -23,20 +23,8 @@ export const toSteamNow = (summary: Summary | undefined, recent: Recent | undefi
   return { isPlaying: false, recent: recent ? toGame(recent.appid, recent.name) : null };
 };
 
-class SteamError extends Error {
-  constructor(what: string, response: Response) {
-    super(`Steam ${what} request failed: ${response.status}`);
-  }
-}
-
-const request = async <T>(what: string, path: string, params: Record<string, string>) => {
-  const response = await fetch(`${API}/${path}?${new URLSearchParams(params)}`, {
-    cache: "no-store",
-    signal: AbortSignal.timeout(TIMEOUT_MS),
-  });
-  if (!response.ok) throw new SteamError(what, response);
-  return (await response.json()) as T;
-};
+const request = <T>(what: string, path: string, params: Record<string, string>) =>
+  fetchJson<T>(`Steam ${what}`, `${API}/${path}?${new URLSearchParams(params)}`);
 
 let resolved: string | null = null;
 
@@ -74,6 +62,6 @@ const loadSteamNow = async (): Promise<SteamNow> => {
   return toSteamNow(summary, recent.response.games?.[0]);
 };
 
-const loadCached = cached(loadSteamNow, { ttlMs: 30_000, errorTtlMs: 15_000 });
+const loadCached = cached(loadSteamNow, { ttlMs: 30_000, errorTtlMs: 15_000, staleMs: 300_000 });
 
 export const getSteamNow = async () => (await loadCached()).data;

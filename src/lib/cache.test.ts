@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { cached } from "./cache";
+import { HttpError } from "./http";
 
 describe("cached", () => {
   it("reuses the value until it expires and reports when it was fetched", async () => {
@@ -42,7 +43,10 @@ describe("cached", () => {
 
   it("honours retryAfterMs on the error", async () => {
     let time = 0;
-    const limited = Object.assign(new Error("429"), { retryAfterMs: 30_000 });
+    const limited = new HttpError(
+      "429",
+      new Response(null, { status: 429, headers: { "retry-after": "30" } }),
+    );
     const load = vi.fn().mockRejectedValueOnce(limited).mockResolvedValueOnce("ok");
     const get = cached(load, { ttlMs: 1_000, errorTtlMs: 5_000, now: () => time });
 
@@ -51,5 +55,22 @@ describe("cached", () => {
     await expect(get()).rejects.toThrow("429");
     time = 30_001;
     expect((await get()).data).toBe("ok");
+  });
+
+  it("serves the last value while refreshes fail, within the stale window", async () => {
+    let time = 0;
+    const load = vi.fn().mockResolvedValueOnce("old").mockRejectedValue(new Error("down"));
+    const get = cached(load, { ttlMs: 1_000, errorTtlMs: 5_000, staleMs: 10_000, now: () => time });
+    const quiet = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    expect((await get()).data).toBe("old");
+    time = 2_000;
+    expect((await get()).data).toBe("old");
+    time = 4_000;
+    expect((await get()).data).toBe("old");
+    expect(load).toHaveBeenCalledTimes(2);
+    time = 11_001;
+    await expect(get()).rejects.toThrow("down");
+    quiet.mockRestore();
   });
 });

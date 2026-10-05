@@ -1,4 +1,5 @@
 import { cached } from "@/lib/cache";
+import { fetchJson, HttpError, request } from "@/lib/http";
 import { advance, type SpotifyNow, spotifyIdle } from "./types";
 
 type Image = { url: string; width: number | null };
@@ -19,7 +20,6 @@ type CurrentlyPlaying = {
 };
 
 const COVER_TARGET_WIDTH = 240;
-const TIMEOUT_MS = 3_000;
 const TOKEN_URL = "https://accounts.spotify.com/api/token";
 const PLAYER_URL = "https://api.spotify.com/v1/me/player/currently-playing?additional_types=track,episode";
 
@@ -27,16 +27,6 @@ export const pickImage = (images: Image[], target = COVER_TARGET_WIDTH) => {
   const sorted = [...images].sort((a, b) => (a.width ?? 0) - (b.width ?? 0));
   return (sorted.find((image) => (image.width ?? 0) >= target) ?? sorted.at(-1))?.url ?? "";
 };
-
-class SpotifyError extends Error {
-  retryAfterMs?: number;
-
-  constructor(what: string, response: Response) {
-    super(`Spotify ${what} request failed: ${response.status}`);
-    const retryAfter = Number(response.headers.get("retry-after"));
-    if (response.status === 429 && retryAfter > 0) this.retryAfterMs = retryAfter * 1000;
-  }
-}
 
 export const toSpotifyNow = (payload: CurrentlyPlaying | null): SpotifyNow => {
   const item = payload?.item;
@@ -84,19 +74,14 @@ let token: { value: string; expiresAt: number } | null = null;
 const accessToken = async ({ clientId, clientSecret, refreshToken }: Credentials) => {
   if (token && token.expiresAt > Date.now()) return token.value;
 
-  const response = await fetch(TOKEN_URL, {
+  const data = await fetchJson<{ access_token: string; expires_in: number }>("Spotify token", TOKEN_URL, {
     method: "POST",
     headers: {
       Authorization: `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString("base64")}`,
       "Content-Type": "application/x-www-form-urlencoded",
     },
     body: new URLSearchParams({ grant_type: "refresh_token", refresh_token: refreshToken }),
-    cache: "no-store",
-    signal: AbortSignal.timeout(TIMEOUT_MS),
   });
-  if (!response.ok) throw new SpotifyError("token", response);
-
-  const data = (await response.json()) as { access_token: string; expires_in: number };
   token = { value: data.access_token, expiresAt: Date.now() + (data.expires_in - 60) * 1000 };
   return token.value;
 };
@@ -105,25 +90,21 @@ const loadSpotifyNow = async (): Promise<SpotifyNow> => {
   const credentials = readCredentials();
   if (!credentials) return spotifyIdle;
 
-  const request = async () =>
-    fetch(PLAYER_URL, {
-      headers: { Authorization: `Bearer ${await accessToken(credentials)}` },
-      cache: "no-store",
-      signal: AbortSignal.timeout(TIMEOUT_MS),
-    });
+  const player = async () =>
+    request(PLAYER_URL, { headers: { Authorization: `Bearer ${await accessToken(credentials)}` } });
 
-  let response = await request();
+  let response = await player();
   if (response.status === 401) {
     token = null;
-    response = await request();
+    response = await player();
   }
   if (response.status === 204) return spotifyIdle;
-  if (!response.ok) throw new SpotifyError("player", response);
+  if (!response.ok) throw new HttpError("Spotify player", response);
 
   return toSpotifyNow((await response.json()) as CurrentlyPlaying);
 };
 
-const loadCached = cached(loadSpotifyNow, { ttlMs: 10_000, errorTtlMs: 5_000 });
+const loadCached = cached(loadSpotifyNow, { ttlMs: 10_000, errorTtlMs: 5_000, staleMs: 60_000 });
 
 export const getSpotifyNow = async () => {
   const { data, fetchedAt } = await loadCached();
