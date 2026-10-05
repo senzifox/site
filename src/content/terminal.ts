@@ -1,6 +1,11 @@
 import type { Terminal, TerminalRow } from "./types";
 
-const role: TerminalRow = { type: "text", key: "role", value: "jr devops · moscow" };
+const title: TerminalRow = {
+  type: "title",
+  user: "лисёнок",
+  host: "senzi.dev",
+  subtitle: "junior devops · still in moscow, sadly",
+};
 
 const links: TerminalRow = {
   type: "links",
@@ -15,21 +20,22 @@ const game: TerminalRow = {
   type: "steam",
   key: "game",
   idleText: "ни во что не играю",
-  recentText: "недавно: {game}",
+  recentText: "недавно в {game}",
 };
 
 const push: TerminalRow = { type: "github", key: "push", user: "senzifox", idleText: "давно не пушил" };
 
 export const terminal: Terminal = {
   main: [
-    { type: "title", user: "сензи", host: "senzi.dev" },
-    role,
+    title,
     links,
-    { type: "list", key: "stack", items: ["docker", "nginx", "ci/cd", "linux"] },
+    //  { type: "text", key: "text", value: "text" },
+    { type: "list", key: "stack", items: ["docker", "nginx", "ci/cd", "linux", "python", "bash", "git"] },
+    //  { type: "status", key: "status", text: "открыт к работе (заглушка)", state: "online" },
     { type: "clock", key: "time", timeZone: "Europe/Moscow" },
     music,
     game,
-    push,
+    //  push,
     { type: "uptime", key: "uptime" },
     { type: "deploy", key: "deploy" },
     { type: "blank" },
@@ -37,19 +43,20 @@ export const terminal: Terminal = {
   ],
 
   short: [
-    { type: "title", user: "сензи", host: "senzi.dev" },
-    { type: "paragraph", text: "jr devops · moscow" },
+    title,
     { type: "blank" },
     { type: "bullet", text: "t.me/senzifox" },
     { type: "bullet", text: "steamcommunity.com/id/senzifox" },
     { type: "bullet", text: "github.com/senzifox" },
+    { type: "bullet", text: "больше я не придумал что сюда поместить" },
+    { type: "bullet", text: "мб потом" },
     { type: "blank" },
     { type: "palette" },
   ],
 
   full: [
-    { type: "title", user: "сензи", host: "senzi.dev" },
-    role,
+    title,
+    //  { type: "status", key: "status", text: "открыт к работе (заглушка)", state: "online" },
     { type: "clock", key: "time", timeZone: "Europe/Moscow" },
     music,
     game,
@@ -57,8 +64,11 @@ export const terminal: Terminal = {
     { type: "blank" },
     { type: "heading", text: "contacts" },
     links,
+    { type: "text", key: "mail", value: "fox@senzi.dev" },
     { type: "blank" },
     { type: "heading", text: "system" },
+    //  { type: "text", key: "os", value: "заглушка" },
+    //  { type: "text", key: "shell", value: "заглушка" },
     { type: "uptime", key: "uptime" },
     { type: "deploy", key: "deploy" },
     { type: "blank" },
@@ -66,12 +76,11 @@ export const terminal: Terminal = {
   ],
 
   about: [
-    { type: "title", user: "сензи", host: "senzi.dev" },
-    { type: "paragraph", text: "jr devops · moscow" },
+    title,
     { type: "blank" },
     {
       type: "paragraph",
-      text: "вот он ВЕЛИКий сайт на который зайдёт три человека, зато гештальт закрыл, а так... потихонечку живу, чёта пытаюсь в айти, по планам не сдохнуть, а так, в целом, всё ок, спасибо что зашёл, я тебя люблю",
+      text: "тут будет абаут ми как только он появится на сайте",
     },
     { type: "blank" },
     links,
