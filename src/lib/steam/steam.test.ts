@@ -25,7 +25,6 @@ describe("toGame", () => {
   it("builds store and image urls", () => {
     expect(toGame(570, "Dota 2")).toEqual({
       name: "Dota 2",
-      appId: "570",
       imageUrl: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/570/header.jpg",
       url: "https://store.steampowered.com/app/570",
     });

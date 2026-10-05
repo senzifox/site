@@ -1,11 +1,7 @@
 import styles from "./Footer.module.css";
 import { Tail } from "./Tail";
 
-type Props = { text: string; href?: string };
-
-export function Footer({ text, href }: Props) {
-  const content = text.replaceAll("{year}", String(new Date().getFullYear()));
-
+export function Footer({ text }: { text: string }) {
   return (
     <footer className={styles.footer}>
       <div className={styles.divider} aria-hidden="true">
@@ -13,13 +9,7 @@ export function Footer({ text, href }: Props) {
         <Tail />
         <span className={`${styles.line} ${styles.lineEnd}`} />
       </div>
-      {href ? (
-        <a className={`${styles.text} ${styles.link}`} href={href} target="_blank" rel="noopener noreferrer">
-          {content}
-        </a>
-      ) : (
-        <span className={styles.text}>{content}</span>
-      )}
+      <span className={styles.text}>{text}</span>
     </footer>
   );
 }

@@ -1,3 +1,4 @@
+import { theme } from "@/content/theme";
 import type { StatusState, TerminalRow } from "@/content/types";
 import { formatAgo, formatClock, formatUptime } from "@/lib/format";
 import type { GithubPush } from "@/lib/github/github";
@@ -16,17 +17,23 @@ export type Live = {
 
 type Rgb = readonly [number, number, number];
 
+const rgb = (hex: string): Rgb => [
+  Number.parseInt(hex.slice(1, 3), 16),
+  Number.parseInt(hex.slice(3, 5), 16),
+  Number.parseInt(hex.slice(5, 7), 16),
+];
+
 const paint = ([r, g, b]: Rgb, s: string) => `\x1b[38;2;${r};${g};${b}m${s}\x1b[0m`;
-const accent = (s: string) => paint([242, 163, 107], s);
-const muted = (s: string) => paint([168, 162, 178], s);
-const strong = (s: string) => paint([244, 240, 248], s);
+const accent = (s: string) => paint(rgb(theme.accent), s);
+const muted = (s: string) => paint(rgb(theme.muted), s);
+const strong = (s: string) => paint(rgb(theme.strong), s);
 const bold = (s: string) => `\x1b[1m${s}\x1b[0m`;
 const dim = (s: string) => `\x1b[2m${s}\x1b[0m`;
 
 const DOT: Record<StatusState, Rgb> = {
-  online: [108, 211, 138],
-  busy: [242, 163, 107],
-  offline: [168, 162, 178],
+  online: rgb(theme.online),
+  busy: rgb(theme.accent),
+  offline: rgb(theme.muted),
 };
 
 const SCREEN = 80;

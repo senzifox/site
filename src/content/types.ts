@@ -50,12 +50,12 @@ export type Site = {
   meta: { title: string; description: string; url: string; locale: string; keywords?: string[] };
   header: {
     name: string;
-    lineAbove?: string | string[];
+    lineAbove?: string[];
     lineBelow?: string;
     socials: Social[];
   };
   blocks: Block[];
-  footer?: { text: string; href?: string };
+  footer?: { text: string };
 };
 
 export type TerminalRow =

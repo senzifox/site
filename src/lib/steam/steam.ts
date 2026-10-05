@@ -11,7 +11,6 @@ const STEAM_ID = /^\d{17}$/;
 
 export const toGame = (appId: string | number, name: string): Game => ({
   name,
-  appId: String(appId),
   imageUrl: `https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/${appId}/header.jpg`,
   url: `https://store.steampowered.com/app/${appId}`,
 });

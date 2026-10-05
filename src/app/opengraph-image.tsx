@@ -2,6 +2,7 @@ import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { ImageResponse } from "next/og";
 import { site } from "@/content/site";
+import { theme } from "@/content/theme";
 
 export const alt = site.meta.title;
 export const size = { width: 1200, height: 630 };
@@ -17,7 +18,7 @@ const loadFont = async (weight: number, text: string) => {
 
 export default async function OpengraphImage() {
   const { name, lineAbove, lineBelow } = site.header;
-  const above = Array.isArray(lineAbove) ? lineAbove[0] : lineAbove;
+  const above = lineAbove?.[0];
   const host = new URL(site.meta.url).host;
   const text = [above, name, lineBelow, host].filter(Boolean).join(" ");
   const avatar = await readFile(join(process.cwd(), "public/avatar-cutout.png"));
@@ -31,7 +32,7 @@ export default async function OpengraphImage() {
         alignItems: "center",
         gap: 56,
         padding: "0 88px",
-        background: "#0d0907",
+        background: theme.background,
         backgroundImage:
           "radial-gradient(ellipse 75% 85% at 28% 0%, rgba(195, 88, 23, 0.34), rgba(140, 55, 15, 0.12) 50%, transparent 100%)",
         fontFamily: "Roboto",
@@ -45,14 +46,14 @@ export default async function OpengraphImage() {
         style={{ alignSelf: "flex-end" }}
       />
       <div style={{ display: "flex", flexDirection: "column" }}>
-        {above && <div style={{ fontSize: 40, fontWeight: 500, color: "#e0956a" }}>{above}</div>}
+        {above && <div style={{ fontSize: 40, fontWeight: 500, color: theme.soft }}>{above}</div>}
         <div
-          style={{ fontSize: 128, fontWeight: 700, color: "#f4f0f8", letterSpacing: -3, lineHeight: 1.05 }}
+          style={{ fontSize: 128, fontWeight: 700, color: theme.strong, letterSpacing: -3, lineHeight: 1.05 }}
         >
           {name}
         </div>
-        {lineBelow && <div style={{ fontSize: 38, color: "#a8a2b2", marginTop: 8 }}>{lineBelow}</div>}
-        <div style={{ fontSize: 30, fontWeight: 500, color: "#f2a36b", marginTop: 48 }}>{host}</div>
+        {lineBelow && <div style={{ fontSize: 38, color: theme.muted, marginTop: 8 }}>{lineBelow}</div>}
+        <div style={{ fontSize: 30, fontWeight: 500, color: theme.accent, marginTop: 48 }}>{host}</div>
       </div>
     </div>,
     {

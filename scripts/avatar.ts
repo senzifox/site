@@ -3,14 +3,13 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import potrace from "potrace";
 import sharp from "sharp";
+import { theme } from "../src/content/theme.ts";
 
 const root = join(import.meta.dirname, "..");
 const sourceDir = join(root, "assets/avatar");
 const photoOut = join(root, "public/avatar.webp");
 const silhouetteOut = join(root, "src/components/Avatar/silhouette.ts");
 const appDir = join(root, "src/app");
-const ACCENT = "#f2a36b";
-const BACKGROUND = "#0d0907";
 const HEAD_VIEWBOX = "190 40 900 900";
 const PHOTO_SIZE = 660;
 const SPARK_MAX_AREA = 100;
@@ -96,9 +95,9 @@ const cutoutSvg = ({ outline: outlineRatio, sparks: withSparks = true, viewBox }
   const stroke = size * outlineRatio * 2;
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox ?? `0 0 ${size} ${size}`}" width="${size}" height="${size}">
   <defs><clipPath id="c"><path d="${d}" clip-rule="evenodd"/></clipPath></defs>
-  <path d="${d}" fill="none" stroke="${ACCENT}" stroke-width="${stroke}" stroke-linejoin="round"/>
+  <path d="${d}" fill="none" stroke="${theme.accent}" stroke-width="${stroke}" stroke-linejoin="round"/>
   <image href="${photoData}" width="${size}" height="${size}" clip-path="url(#c)"/>
-  ${withSparks && sparks ? `<path d="${sparks}" fill="${ACCENT}" stroke="${ACCENT}" stroke-width="${stroke / 2}"/>` : ""}
+  ${withSparks && sparks ? `<path d="${sparks}" fill="${theme.accent}" stroke="${theme.accent}" stroke-width="${stroke / 2}"/>` : ""}
 </svg>`;
 };
 
@@ -128,7 +127,7 @@ const ico = (images: { size: number; png: Buffer }[]) => {
 
 await renderCutout(512, { outline: 0.012 }).toFile(join(root, "public/avatar-cutout.png"));
 await renderCutout(192, { outline: 0.025 }).toFile(join(appDir, "icon.png"));
-await sharp({ create: { width: 180, height: 180, channels: 4, background: BACKGROUND } })
+await sharp({ create: { width: 180, height: 180, channels: 4, background: theme.background } })
   .composite([{ input: await renderCutout(156, { outline: 0.02 }).toBuffer(), gravity: "south" }])
   .png({ palette: true, compressionLevel: 9 })
   .toFile(join(appDir, "apple-icon.png"));

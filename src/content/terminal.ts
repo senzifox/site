@@ -1,4 +1,7 @@
+import { profile } from "./profile";
 import type { TerminalRow } from "./types";
+
+const bare = (url: string) => url.replace(/^https:\/\//, "");
 
 const title: TerminalRow = {
   type: "title",
@@ -10,7 +13,7 @@ const title: TerminalRow = {
 const links: TerminalRow = {
   type: "links",
   key: "find me",
-  handle: "@senzifox",
+  handle: `@${profile.handle}`,
   services: ["tg", "steam", "github"],
 };
 
@@ -23,16 +26,16 @@ const game: TerminalRow = {
   recentText: "недавно в {game}",
 };
 
-const push: TerminalRow = { type: "github", key: "push", user: "senzifox", idleText: "давно не пушил" };
+const push: TerminalRow = { type: "github", key: "push", user: profile.handle, idleText: "давно не пушил" };
 
 export const terminal = {
   main: [
     title,
     links,
     //  { type: "text", key: "text", value: "text" },
-    { type: "list", key: "stack", items: ["docker", "nginx", "ci/cd", "linux", "python", "bash", "git"] },
+    { type: "list", key: "stack", items: profile.stack },
     //  { type: "status", key: "status", text: "открыт к работе (заглушка)", state: "online" },
-    { type: "clock", key: "time", timeZone: "Europe/Moscow" },
+    { type: "clock", key: "time", timeZone: profile.timeZone },
     music,
     game,
     //  push,
@@ -45,9 +48,9 @@ export const terminal = {
   short: [
     title,
     { type: "blank" },
-    { type: "bullet", text: "t.me/senzifox" },
-    { type: "bullet", text: "steamcommunity.com/id/senzifox" },
-    { type: "bullet", text: "github.com/senzifox" },
+    { type: "bullet", text: bare(profile.links.telegram) },
+    { type: "bullet", text: bare(profile.links.steam) },
+    { type: "bullet", text: bare(profile.links.github) },
     { type: "bullet", text: "больше я не придумал что сюда поместить" },
     { type: "bullet", text: "мб потом" },
     { type: "blank" },
@@ -57,14 +60,14 @@ export const terminal = {
   full: [
     title,
     //  { type: "status", key: "status", text: "открыт к работе (заглушка)", state: "online" },
-    { type: "clock", key: "time", timeZone: "Europe/Moscow" },
+    { type: "clock", key: "time", timeZone: profile.timeZone },
     music,
     game,
     push,
     { type: "blank" },
     { type: "heading", text: "contacts" },
     links,
-    { type: "text", key: "mail", value: "fox@senzi.dev" },
+    { type: "text", key: "mail", value: profile.mail },
     { type: "blank" },
     { type: "heading", text: "system" },
     //  { type: "text", key: "os", value: "заглушка" },

@@ -57,11 +57,3 @@
   letter-spacing: 0.8px;
   color: var(--text-muted);
 }
-
-.link {
-  transition: color 150ms;
-}
-
-.link:hover {
-  color: var(--accent);
-}

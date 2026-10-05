@@ -97,7 +97,7 @@ describe("renderTerminal", () => {
         durationMs: 1,
       },
       steam: { isPlaying: false, recent: toGame(570, "Dota 2") },
-      github: { repo: "fox/site", url: "", at: "2026-10-05T11:00:00Z" },
+      github: { repo: "fox/site", at: "2026-10-05T11:00:00Z" },
       uptime: 3 * 3600,
     });
     expect(busy).toMatch(/music +band\n +song/);

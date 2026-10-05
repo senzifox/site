@@ -10,7 +10,6 @@ describe("latestPush", () => {
     ];
     expect(latestPush(events)).toEqual({
       repo: "a/site",
-      url: "https://github.com/a/site",
       at: "2026-10-05T09:00:00Z",
     });
   });

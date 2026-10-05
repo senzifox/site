@@ -1,15 +1,13 @@
 import { cached, type Fetched } from "@/lib/cache";
 import { fetchJson } from "@/lib/http";
 
-export type GithubPush = { repo: string; url: string; at: string };
+export type GithubPush = { repo: string; at: string };
 
 type Event = { type: string; repo: { name: string }; created_at: string };
 
 export const latestPush = (events: Event[]): GithubPush | null => {
   const push = events.find((event) => event.type === "PushEvent");
-  return push
-    ? { repo: push.repo.name, url: `https://github.com/${push.repo.name}`, at: push.created_at }
-    : null;
+  return push ? { repo: push.repo.name, at: push.created_at } : null;
 };
 
 const load = (user: string) => async () =>

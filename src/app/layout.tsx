@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { JetBrains_Mono, Roboto_Flex } from "next/font/google";
 import type { ReactNode } from "react";
 import { site } from "@/content/site";
+import { theme } from "@/content/theme";
 import { personJsonLd } from "@/lib/jsonLd";
 import "./globals.css";
 
@@ -39,7 +40,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   colorScheme: "dark",
-  themeColor: "#0d0907",
+  themeColor: theme.background,
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

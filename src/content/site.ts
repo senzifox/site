@@ -1,3 +1,4 @@
+import { profile } from "./profile";
 import type { Site } from "./types";
 
 export const site: Site = {
@@ -33,15 +34,11 @@ export const site: Site = {
     ],
     lineBelow: "junior devops · still in moscow, sadly",
     socials: [
-      { icon: "telegram", label: "telegram", href: "https://t.me/senzifox" },
-      { icon: "steam", label: "steam", href: "https://steamcommunity.com/id/senzifox" },
-      { icon: "github", label: "github", href: "https://github.com/senzifox" },
-      {
-        icon: "spotify",
-        label: "spotify",
-        href: "https://open.spotify.com/user/31t4toue4cqdpnzamugmuj5pwkqe?si=7d0fa44dc4d645e5",
-      },
-      { icon: "discord", label: "discord", copy: "senzifox" },
+      { icon: "telegram", label: "telegram", href: profile.links.telegram },
+      { icon: "steam", label: "steam", href: profile.links.steam },
+      { icon: "github", label: "github", href: profile.links.github },
+      { icon: "spotify", label: "spotify", href: profile.links.spotify },
+      { icon: "discord", label: "discord", copy: profile.handle },
     ],
   },
 
@@ -57,7 +54,7 @@ export const site: Site = {
       label: "сейчас играет",
       idleText: "сейчас ничего не играет(",
       idleHint: "но ты можешь перейти на профиль",
-      href: "https://open.spotify.com/user/31t4toue4cqdpnzamugmuj5pwkqe?si=7d0fa44dc4d645e5",
+      href: profile.links.spotify,
     },
     {
       type: "steam",
@@ -65,18 +62,18 @@ export const site: Site = {
       idleText: "сейчас ни во что не играю",
       idleHint: "но ты можешь перейти на профиль",
       recentHint: "недавно в {game}",
-      href: "https://steamcommunity.com/id/senzifox",
+      href: profile.links.steam,
     },
     {
       type: "list",
       label: "то в чём я разбираюсь, или пытаюсь, стек короче",
-      items: ["docker", "nginx", "ci/cd", "linux", "python", "bash", "git"],
+      items: profile.stack,
     },
     {
       type: "copy",
       icon: "mail",
       label: "сюда можно деловые предложения закинуть, но лучше в телеграмм",
-      value: "fox@senzi.dev",
+      value: profile.mail,
     },
     {
       type: "text",

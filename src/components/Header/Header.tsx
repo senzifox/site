@@ -10,14 +10,14 @@ type Props = {
   avatar: ReactNode;
   avatarSize: number;
   name: string;
-  lineAbove?: string | string[];
+  lineAbove?: string[];
   lineBelow?: string;
   socials: ReactNode;
 };
 
 export function Header({ avatar, avatarSize, name, lineAbove, lineBelow, socials }: Props) {
   const m = useHeaderMotion(avatarSize);
-  const lineAboveItems = (typeof lineAbove === "string" ? [lineAbove] : (lineAbove ?? [])).filter(Boolean);
+  const lineAboveItems = (lineAbove ?? []).filter(Boolean);
 
   return (
     <motion.header

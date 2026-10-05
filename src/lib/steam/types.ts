@@ -1,4 +1,4 @@
-export type Game = { name: string; appId: string; imageUrl: string; url: string };
+export type Game = { name: string; imageUrl: string; url: string };
 
 export type SteamNow = { isPlaying: true; game: Game } | { isPlaying: false; recent: Game | null };
 
