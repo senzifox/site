@@ -5,6 +5,7 @@ import { lerp, lightProgress } from "@/lib/scroll";
 import styles from "./Background.module.css";
 
 const GLOW = 0.5;
+const DOT_STEP = 28;
 
 export function Background() {
   const { scrollY } = useScroll();
@@ -23,15 +24,17 @@ export function Background() {
     return `radial-gradient(ellipse ${rx}% ${ry}% at 50% 0, #000, rgb(0 0 0 / 0.45) 100%)`;
   });
 
-  const patternPosition = useTransform(scrollY, (y) => `0 ${-0.25 * y}px`);
+  const patternY = useTransform(scrollY, (y) => -((0.25 * y) % DOT_STEP));
 
   return (
     <div aria-hidden="true">
       <motion.div className={styles.layer} style={{ background: light }} />
       <motion.div
-        className={`${styles.layer} ${styles.pattern}`}
-        style={{ backgroundPosition: patternPosition, maskImage: mask, WebkitMaskImage: mask }}
-      />
+        className={`${styles.layer} ${styles.patternFrame}`}
+        style={{ maskImage: mask, WebkitMaskImage: mask }}
+      >
+        <motion.div className={styles.pattern} style={{ y: patternY }} />
+      </motion.div>
     </div>
   );
 }

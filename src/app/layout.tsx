@@ -8,7 +8,6 @@ import "./globals.css";
 
 const sans = Roboto_Flex({
   subsets: ["latin", "cyrillic"],
-  axes: ["opsz"],
   variable: "--font-sans",
   display: "swap",
 });

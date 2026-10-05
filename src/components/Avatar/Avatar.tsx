@@ -1,11 +1,15 @@
+import { preload } from "react-dom";
 import styles from "./Avatar.module.css";
 import { silhouette } from "./silhouette";
 
 export const AVATAR_SIZE = 220;
 
+const PHOTO = "/avatar.webp";
+
 const OUTLINE_WIDTH = 2;
 
 export function Avatar({ alt }: { alt: string }) {
+  preload(PHOTO, { as: "image", fetchPriority: "high" });
   const { size, d, sparks } = silhouette;
   const strokeWidth = (OUTLINE_WIDTH * 2 * size) / AVATAR_SIZE;
 
@@ -25,7 +29,7 @@ export function Avatar({ alt }: { alt: string }) {
         </clipPath>
       </defs>
       <use href="#avatar-shape" className={styles.outline} strokeWidth={strokeWidth} />
-      <image href="/avatar.webp" width={size} height={size} clipPath="url(#avatar-clip)" />
+      <image href={PHOTO} width={size} height={size} clipPath="url(#avatar-clip)" />
       {sparks && <path d={sparks} className={styles.sparks} strokeWidth={strokeWidth / 2} />}
     </svg>
   );
