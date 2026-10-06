@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { type MouseEvent, useEffect, useRef, useState } from "react";
 import { Icon } from "@/components/Icon/Icon";
 import type { IconName } from "@/components/Icon/icons";
+import { burstFrom } from "@/lib/burst";
 import { stripWhitespace } from "@/lib/format";
 
 const COPIED_MS = 1400;
@@ -36,12 +37,14 @@ export function CopyButton({ value, className, copiedClassName, icon = "copy", s
 
   useEffect(() => () => clearTimeout(timer.current), []);
 
-  const copy = async () => {
+  const copy = async (event: MouseEvent<HTMLButtonElement>) => {
+    const button = event.currentTarget;
     try {
       await copyText(stripWhitespace(value));
     } catch {
       return;
     }
+    burstFrom(button);
     setCopied(true);
     clearTimeout(timer.current);
     timer.current = setTimeout(() => setCopied(false), COPIED_MS);
