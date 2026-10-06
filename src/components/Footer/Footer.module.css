@@ -57,3 +57,16 @@
   letter-spacing: 0.8px;
   color: var(--text-muted);
 }
+
+.link {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.link:hover,
+.link:focus-visible {
+  color: var(--text-strong);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}

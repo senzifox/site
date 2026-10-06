@@ -55,8 +55,10 @@ export type Site = {
     socials: Social[];
   };
   blocks: Block[];
-  footer?: { text: string };
+  footer?: FooterContent;
 };
+
+export type FooterContent = { text: string; link?: { label: string; href: string } };
 
 export type TerminalRow =
   | { type: "title"; user: string; host: string; subtitle?: string }
