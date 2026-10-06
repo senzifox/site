@@ -86,5 +86,8 @@ export const site: Site = {
     //  { type: "code", label: "neofetch", lines: ["тут типа в будущем можно код написать, пока не придумал что сюда"] },
     //  { type: "link", icon: "github", label: "github", value: "senzifox/заглушка", href: "https://github.com/senzifox" },
   ],
-  footer: { text: "senzifox © точно, стопроцентов, клянусь не вайбкод" },
+  footer: {
+    text: "senzifox ©",
+    link: { label: "точно, стопроцентов, клянусь не вайбкод", href: profile.links.repo },
+  },
 };
