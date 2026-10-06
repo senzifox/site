@@ -1,6 +1,7 @@
 "use client";
 
 import { type ReactNode, useEffect, useRef } from "react";
+import { pointer, subscribePointer } from "@/lib/pointer";
 import { clamp01, smoothstep } from "@/lib/scroll";
 import styles from "./Avatar.module.css";
 import { silhouette } from "./silhouette";
@@ -30,7 +31,6 @@ export function Sparks({ children }: { children: ReactNode }) {
     const circles = [...svg.querySelectorAll("circle")];
     const state = field.sparks.map(() => ({ dx: 0, dy: 0, vx: 0, vy: 0, heat: 0 }));
     const reduced = matchMedia("(prefers-reduced-motion: reduce)");
-    let pointer: { x: number; y: number } | null = null;
     let time = 0;
     let last = 0;
     let frame = 0;
@@ -44,7 +44,7 @@ export function Sparks({ children }: { children: ReactNode }) {
       const rect = svg.getBoundingClientRect();
       const scale = rect.width > 0 ? size / rect.width : 0;
       const grow = rect.width > 0 ? svg.clientWidth / rect.width : 1;
-      const cursor = pointer &&
+      const cursor = pointer.active &&
         scale > 0 && { x: (pointer.x - rect.left) * scale, y: (pointer.y - rect.top) * scale };
       const radius = CURSOR_RADIUS * scale;
 
@@ -92,14 +92,6 @@ export function Sparks({ children }: { children: ReactNode }) {
       last = 0;
     };
 
-    const onPointerMove = (event: PointerEvent) => {
-      pointer = event.pointerType === "touch" ? null : { x: event.clientX, y: event.clientY };
-    };
-
-    const onPointerLeave = () => {
-      pointer = null;
-    };
-
     const onMotionChange = () => (reduced.matches ? sleep() : wake());
 
     burst.current = () => {
@@ -119,17 +111,13 @@ export function Sparks({ children }: { children: ReactNode }) {
     };
 
     wake();
-    window.addEventListener("pointermove", onPointerMove, { passive: true });
-    window.addEventListener("blur", onPointerLeave);
-    document.documentElement.addEventListener("pointerleave", onPointerLeave);
+    const release = subscribePointer(wake);
     reduced.addEventListener("change", onMotionChange);
 
     return () => {
       sleep();
       burst.current = () => {};
-      window.removeEventListener("pointermove", onPointerMove);
-      window.removeEventListener("blur", onPointerLeave);
-      document.documentElement.removeEventListener("pointerleave", onPointerLeave);
+      release();
       reduced.removeEventListener("change", onMotionChange);
     };
   }, []);
