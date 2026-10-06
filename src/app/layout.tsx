@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { JetBrains_Mono, Roboto_Flex } from "next/font/google";
 import type { ReactNode } from "react";
+import { CardGlow } from "@/components/Card/CardGlow";
 import { site } from "@/content/site";
 import { theme } from "@/content/theme";
 import { personJsonLd } from "@/lib/jsonLd";
@@ -52,6 +53,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd()) }}
         />
         {children}
+        <CardGlow />
       </body>
     </html>
   );
