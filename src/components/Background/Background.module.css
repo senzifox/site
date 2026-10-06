@@ -17,3 +17,28 @@
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28'%3E%3Ccircle cx='14' cy='14' r='1.2' fill='rgba(255,255,255,.08)'/%3E%3C/svg%3E");
   background-size: 28px 28px;
 }
+
+.spot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 400ms ease;
+  will-change: transform;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28'%3E%3Ccircle cx='14' cy='14' r='1.4' fill='rgba(242,163,107,.8)'/%3E%3C/svg%3E");
+  background-size: 28px 28px;
+  mask-image: radial-gradient(circle closest-side, #000, rgb(0 0 0 / 0.35) 55%, transparent);
+  -webkit-mask-image: radial-gradient(circle closest-side, #000, rgb(0 0 0 / 0.35) 55%, transparent);
+}
+
+.on {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spot {
+    transition: none;
+  }
+}
