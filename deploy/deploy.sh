@@ -2,6 +2,7 @@
 set -euo pipefail
 
 : "${IMAGE:?IMAGE is required}"
+cd "$(dirname "$0")"
 CONTAINER=site
 HEALTH_TIMEOUT=${HEALTH_TIMEOUT:-60}
 

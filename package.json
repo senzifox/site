@@ -20,7 +20,7 @@
     "icons": "node scripts/icons.ts",
     "fox": "node scripts/fox.ts",
     "spotify:auth": "node --env-file=.env.local scripts/spotify-auth.ts",
-    "docker:local": "docker build -t site:local . && IMAGE=site:local docker compose --env-file .env.local up -d"
+    "docker:local": "docker build -f deploy/Dockerfile -t site:local . && IMAGE=site:local docker compose -f deploy/compose.yaml --env-file .env.local up -d"
   },
   "dependencies": {
     "motion": "^13.5.0",

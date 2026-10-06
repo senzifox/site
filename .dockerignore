@@ -8,5 +8,5 @@ scripts
 *.md
 .env
 .env.*
-Dockerfile
-compose.yaml
+deploy
+LICENSE
