@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { pointer, subscribePointer } from "@/lib/pointer";
 import { clamp01, smoothstep } from "@/lib/scroll";
+import { registerAction, tuning } from "@/lib/tuning";
 import styles from "./Avatar.module.css";
 import { avatars } from "./silhouette";
 import { createSparkField, keepClear, type SparkField, sparkPose } from "./sparks";
@@ -12,11 +13,6 @@ const [{ size }] = avatars;
 
 const WARMUP = 1.4;
 const MAX_STEP = 0.05;
-const CURSOR_RADIUS = 80;
-const PUSH = 5200;
-const SPRING = 38;
-const DAMPING = 8.5;
-const BURST = 1500;
 const HEAT_DECAY = 3;
 const SETTLE = 0.8;
 const RETARGET_BURST = 0.5;
@@ -50,15 +46,16 @@ export function Sparks({ face, burst }: Props) {
       const grow = rect.width > 0 ? svg.clientWidth / rect.width : 1;
       const cursor = pointer.active &&
         scale > 0 && { x: (pointer.x - rect.left) * scale, y: (pointer.y - rect.top) * scale };
-      const radius = CURSOR_RADIUS * scale;
+      const { cursorRadius, push, spring, damping } = tuning.sparks;
+      const radius = cursorRadius * scale;
       settle = Math.min(1, settle + dt / SETTLE);
       const clearing = smoothstep(settle);
 
       for (const [i, spark] of field.sparks.entries()) {
         const pose = sparkPose(field, spark, time, motion);
         const s = state[i];
-        let ax = -SPRING * s.dx - DAMPING * s.vx;
-        let ay = -SPRING * s.dy - DAMPING * s.vy;
+        let ax = -spring * s.dx - damping * s.vx;
+        let ay = -spring * s.dy - damping * s.vy;
         let warmth = 0;
         if (cursor) {
           const ox = pose.x + s.dx - cursor.x;
@@ -66,8 +63,8 @@ export function Sparks({ face, burst }: Props) {
           const dist = Math.sqrt(ox * ox + oy * oy) || 1;
           if (dist < radius) {
             const k = 1 - dist / radius;
-            ax += (ox / dist) * PUSH * k * k;
-            ay += (oy / dist) * PUSH * k * k;
+            ax += (ox / dist) * push * k * k;
+            ay += (oy / dist) * push * k * k;
             warmth = k;
           }
         }
@@ -115,7 +112,7 @@ export function Sparks({ face, burst }: Props) {
         const ox = pose.x + s.dx - field.center.x;
         const oy = pose.y + s.dy - field.center.y;
         const dist = Math.sqrt(ox * ox + oy * oy) || 1;
-        const impulse = BURST * strength * (0.6 + Math.random() * 0.8);
+        const impulse = tuning.sparks.burst * strength * (0.6 + Math.random() * 0.8);
         s.vx += (ox / dist) * impulse;
         s.vy += (oy / dist) * impulse;
         s.heat = Math.max(s.heat, strength);
@@ -153,12 +150,14 @@ export function Sparks({ face, burst }: Props) {
 
     wake();
     const release = subscribePointer(wake);
+    const unregister = registerAction("sparks.burst", () => actions.current.burst());
     reduced.addEventListener("change", onMotionChange);
 
     return () => {
       sleep();
       actions.current = { burst: () => {}, retarget: () => {} };
       release();
+      unregister();
       reduced.removeEventListener("change", onMotionChange);
     };
   }, []);

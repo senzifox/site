@@ -1,0 +1,44 @@
+.toggle {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 1000;
+  height: 36px;
+  padding: 0 14px;
+  border: 1px solid rgb(255 255 255 / 0.12);
+  border-radius: 18px;
+  background: rgb(var(--head) / 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: var(--accent);
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 12px;
+  letter-spacing: 0.8px;
+  cursor: pointer;
+}
+
+.panel {
+  position: fixed;
+  right: 16px;
+  bottom: 60px;
+  z-index: 1000;
+  width: 320px;
+  max-height: calc(100vh - 80px);
+  overflow: auto;
+  border-radius: 10px;
+}
+
+.panel[hidden] {
+  display: none;
+}
+
+@media (max-width: 480px) {
+  .panel {
+    right: 0;
+    left: 0;
+    bottom: 60px;
+    width: auto;
+    max-height: 60vh;
+    border-radius: 10px 10px 0 0;
+  }
+}
