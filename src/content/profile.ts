@@ -3,6 +3,7 @@ export const profile = {
   mail: "fox@senzi.dev",
   timeZone: "Europe/Moscow",
   stack: ["docker", "nginx", "ci/cd", "linux", "python", "bash", "git"],
+  steamHidden: ["ShareX", "Wallpaper Engine"],
   links: {
     telegram: "https://t.me/senzifox",
     steam: "https://steamcommunity.com/id/senzifox",
