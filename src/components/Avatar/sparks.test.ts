@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { contains } from "@/lib/contour";
 import { avatars } from "./silhouette";
-import { createSparkField, cropDistance, sparkPose } from "./sparks";
+import { clockAt, createSparkField, cropDistance, sparkPose } from "./sparks";
 
 describe.each(avatars.map((avatar, i) => [i + 1, avatar] as const))("avatar %i", (_, { d, size }) => {
   const field = createSparkField(d, size);
@@ -18,7 +18,7 @@ describe.each(avatars.map((avatar, i) => [i + 1, avatar] as const))("avatar %i",
   it("never puts a spark inside the silhouette", () => {
     for (let time = 0; time <= 120; time += 0.5) {
       for (const spark of field.sparks) {
-        const pose = sparkPose(field, spark, time, 1);
+        const pose = sparkPose(field, spark, clockAt(field, spark, time), 1);
         expect(contains(field.outline, pose)).toBe(false);
         expect(pose.alpha).toBeGreaterThanOrEqual(0);
         expect(pose.alpha).toBeLessThanOrEqual(1);
@@ -26,11 +26,11 @@ describe.each(avatars.map((avatar, i) => [i + 1, avatar] as const))("avatar %i",
     }
   });
 
-  it("starts without wobble or twinkle", () => {
+  it("moves only through its clock", () => {
     const [spark] = field.sparks;
-    const still = sparkPose(field, spark, 0, 0);
-    expect(sparkPose(field, spark, 0, 0)).toEqual(still);
-    expect(still.alpha).toBeLessThanOrEqual(spark.glow);
+    const still = sparkPose(field, spark, clockAt(field, spark, 0), 0);
+    expect(sparkPose(field, spark, clockAt(field, spark, 0), 0)).toEqual(still);
+    expect(sparkPose(field, spark, clockAt(field, spark, 7), 0)).not.toEqual(still);
   });
 });
 

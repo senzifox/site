@@ -1,5 +1,20 @@
 export const defaults = {
   sparks: { cursorRadius: 80, push: 5200, spring: 38, damping: 8.5, burst: 1500 },
+  sparkLook: {
+    size: [6, 14],
+    speed: [14, 40],
+    offset: 40,
+    spread: 120,
+    margin: 28,
+    wobble: [8, 28],
+    wobbleSpeed: [0.35, 0.95],
+    glow: [0.45, 0.9],
+    twinkle: [0.12, 0.37],
+    twinkleSpeed: [0.6, 2],
+    heatGrow: 0.7,
+    heatGlow: 0.5,
+    heatDecay: 3,
+  },
 };
 
 export type Tuning = typeof defaults;

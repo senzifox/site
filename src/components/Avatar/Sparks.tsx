@@ -6,18 +6,28 @@ import { clamp01, smoothstep } from "@/lib/scroll";
 import { registerAction, tuning } from "@/lib/tuning";
 import styles from "./Avatar.module.css";
 import { avatars } from "./silhouette";
-import { createSparkField, keepClear, type SparkField, sparkPose } from "./sparks";
+import {
+  clockAt,
+  createSparkField,
+  keepClear,
+  type SparkField,
+  sparkPose,
+  sparkRates,
+  sparkSize,
+} from "./sparks";
 
 const fields = avatars.map(({ d, size }) => createSparkField(d, size));
 const [{ size }] = avatars;
 
 const WARMUP = 1.4;
 const MAX_STEP = 0.05;
-const HEAT_DECAY = 3;
 const SETTLE = 0.8;
 const RETARGET_BURST = 0.5;
 
-const initial = fields[0].sparks.map((spark) => ({ spark, pose: sparkPose(fields[0], spark, 0, 0) }));
+const initial = fields[0].sparks.map((spark) => ({
+  spark,
+  pose: sparkPose(fields[0], spark, clockAt(fields[0], spark, 0), 0),
+}));
 
 type Props = { face: number; burst: number };
 
@@ -29,7 +39,16 @@ export function Sparks({ face, burst }: Props) {
     const svg = layer.current;
     if (!svg) return;
     const circles = [...svg.querySelectorAll("circle")];
-    const state = initial.map(({ pose }) => ({ x: pose.x, y: pose.y, dx: 0, dy: 0, vx: 0, vy: 0, heat: 0 }));
+    const state = initial.map(({ pose }) => ({
+      x: pose.x,
+      y: pose.y,
+      dx: 0,
+      dy: 0,
+      vx: 0,
+      vy: 0,
+      heat: 0,
+      clock: { drift: 0, wobble: 0, twinkle: 0 },
+    }));
     const reduced = matchMedia("(prefers-reduced-motion: reduce)");
     let field: SparkField = fields[0];
     let settle = 1;
@@ -47,13 +66,18 @@ export function Sparks({ face, burst }: Props) {
       const cursor = pointer.active &&
         scale > 0 && { x: (pointer.x - rect.left) * scale, y: (pointer.y - rect.top) * scale };
       const { cursorRadius, push, spring, damping } = tuning.sparks;
+      const look = tuning.sparkLook;
       const radius = cursorRadius * scale;
       settle = Math.min(1, settle + dt / SETTLE);
       const clearing = smoothstep(settle);
 
       for (const [i, spark] of field.sparks.entries()) {
-        const pose = sparkPose(field, spark, time, motion);
         const s = state[i];
+        const rates = sparkRates(field, spark);
+        s.clock.drift += rates.drift * dt;
+        s.clock.wobble += rates.wobble * dt;
+        s.clock.twinkle += rates.twinkle * dt;
+        const pose = sparkPose(field, spark, s.clock, motion);
         let ax = -spring * s.dx - damping * s.vx;
         let ay = -spring * s.dy - damping * s.vy;
         let warmth = 0;
@@ -72,7 +96,7 @@ export function Sparks({ face, burst }: Props) {
         s.vy += ay * dt;
         s.dx += s.vx * dt;
         s.dy += s.vy * dt;
-        s.heat = Math.max(warmth, s.heat - HEAT_DECAY * dt * s.heat);
+        s.heat = Math.max(warmth, s.heat - look.heatDecay * dt * s.heat);
 
         const raw = { x: pose.x + s.dx, y: pose.y + s.dy };
         const clear = keepClear(field, raw);
@@ -81,8 +105,8 @@ export function Sparks({ face, burst }: Props) {
         const circle = circles[i];
         circle.setAttribute("cx", s.x.toFixed(1));
         circle.setAttribute("cy", s.y.toFixed(1));
-        circle.setAttribute("r", (spark.r * grow * (1 + 0.7 * s.heat)).toFixed(1));
-        circle.setAttribute("opacity", Math.min(1, pose.alpha + 0.5 * s.heat).toFixed(2));
+        circle.setAttribute("r", (sparkSize(spark) * grow * (1 + look.heatGrow * s.heat)).toFixed(1));
+        circle.setAttribute("opacity", Math.min(1, pose.alpha + look.heatGlow * s.heat).toFixed(2));
       }
     };
 
@@ -107,8 +131,8 @@ export function Sparks({ face, burst }: Props) {
     const scatter = (strength: number) => {
       const motion = motionAt();
       for (const [i, spark] of field.sparks.entries()) {
-        const pose = sparkPose(field, spark, time, motion);
         const s = state[i];
+        const pose = sparkPose(field, spark, s.clock, motion);
         const ox = pose.x + s.dx - field.center.x;
         const oy = pose.y + s.dy - field.center.y;
         const dist = Math.sqrt(ox * ox + oy * oy) || 1;
@@ -132,8 +156,8 @@ export function Sparks({ face, burst }: Props) {
         if (!next || next === field) return;
         const motion = motionAt();
         for (const [i, spark] of next.sparks.entries()) {
-          const target = sparkPose(next, spark, time, motion);
           const s = state[i];
+          const target = sparkPose(next, spark, s.clock, motion);
           s.dx = reduced.matches ? 0 : s.x - target.x;
           s.dy = reduced.matches ? 0 : s.y - target.y;
         }
@@ -176,7 +200,7 @@ export function Sparks({ face, burst }: Props) {
           className={styles.spark}
           cx={pose.x.toFixed(1)}
           cy={pose.y.toFixed(1)}
-          r={spark.r.toFixed(1)}
+          r={sparkSize(spark).toFixed(1)}
           opacity={pose.alpha.toFixed(2)}
         />
       ))}

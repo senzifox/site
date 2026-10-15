@@ -7,6 +7,7 @@ import {
   smoothClosed,
 } from "@/lib/contour";
 import { clamp01, smoothstep } from "@/lib/scroll";
+import { tuning } from "@/lib/tuning";
 
 const COUNT = 22;
 const SEED = 0x5e2f0c;
@@ -15,23 +16,29 @@ const CROP_TOUCH = 2;
 const CROP_HIDE = 100;
 const CROP_FADE = 280;
 const SMOOTHING = 8;
-const MARGIN = 28;
 const TAU = Math.PI * 2;
+
+type Pick = {
+  reach: number;
+  speed: number;
+  size: number;
+  wobble: number;
+  wobbleSpeed: number;
+  glow: number;
+  twinkle: number;
+  twinkleSpeed: number;
+};
 
 export type Spark = {
   id: number;
   u: number;
-  speed: number;
-  offset: number;
-  r: number;
-  wobble: number;
-  wobbleFreq: number;
+  direction: 1 | -1;
+  pick: Pick;
   wobblePhase: number;
-  glow: number;
-  twinkle: number;
-  twinkleFreq: number;
   twinklePhase: number;
 };
+
+export type SparkClock = { drift: number; wobble: number; twinkle: number };
 
 type Crop = { size: number; left: boolean; right: boolean; top: boolean; bottom: boolean };
 
@@ -40,6 +47,7 @@ export type SparkField = {
   track: ContourSample[];
   crop: Crop;
   center: Point;
+  length: number;
   sparks: Spark[];
 };
 
@@ -112,25 +120,30 @@ export const createSparkField = (d: string, size: number): SparkField => {
   const length = arcLength(track);
   const rnd = random(SEED);
 
-  const sparks = Array.from({ length: COUNT }, (_, id) => {
+  const sparks = Array.from({ length: COUNT }, (_, id): Spark => {
     const reach = rnd();
+    const u = (id + 0.1 + rnd() * 0.8) / COUNT;
+    const direction = rnd() < 0.5 ? -1 : 1;
+    const speed = rnd();
+    const size = rnd();
+    const wobble = rnd();
+    const wobbleSpeed = rnd();
+    const wobblePhase = rnd() * TAU;
+    const glow = rnd();
+    const twinkle = rnd();
+    const twinkleSpeed = rnd();
+    const twinklePhase = rnd() * TAU;
     return {
       id,
-      u: (id + 0.1 + rnd() * 0.8) / COUNT,
-      speed: ((rnd() < 0.5 ? -1 : 1) * (14 + rnd() * 26)) / length,
-      offset: MARGIN + 12 + 120 * reach * reach,
-      r: 6 + rnd() * 8,
-      wobble: 8 + rnd() * 20,
-      wobbleFreq: 0.35 + rnd() * 0.6,
-      wobblePhase: rnd() * TAU,
-      glow: 0.45 + rnd() * 0.45,
-      twinkle: 0.12 + rnd() * 0.25,
-      twinkleFreq: 0.6 + rnd() * 1.4,
-      twinklePhase: rnd() * TAU,
+      u,
+      direction,
+      pick: { reach, speed, size, wobble, wobbleSpeed, glow, twinkle, twinkleSpeed },
+      wobblePhase,
+      twinklePhase,
     };
   });
 
-  return { outline, track, crop, center, sparks };
+  return { outline, track, crop, center, length, sparks };
 };
 
 const triangle = (x: number) => {
@@ -156,17 +169,40 @@ const trackAt = (track: ContourSample[], u: number) => {
 const edgeFade = (crop: Crop, point: Point) =>
   smoothstep(clamp01((cropDistance(crop, point) - CROP_HIDE) / (CROP_FADE - CROP_HIDE)));
 
-export const keepClear = (field: SparkField, point: Point) => keepOutside(field.outline, point, MARGIN);
+const between = ([min, max]: number[], t: number) => min + (max - min) * t;
 
-export const sparkPose = (field: SparkField, spark: Spark, time: number, motion: number): SparkPose => {
-  const point = trackAt(field.track, triangle(spark.u + spark.speed * time));
-  const wobble = motion * spark.wobble * Math.sin(spark.wobbleFreq * time + spark.wobblePhase);
-  const offset = Math.max(0, spark.offset + wobble);
-  const twinkle = motion * spark.twinkle * Math.sin(spark.twinkleFreq * time + spark.twinklePhase);
+export const sparkSize = (spark: Spark) => between(tuning.sparkLook.size, spark.pick.size);
+
+export const sparkRates = (field: SparkField, spark: Spark): SparkClock => {
+  const look = tuning.sparkLook;
+  return {
+    drift: (spark.direction * between(look.speed, spark.pick.speed)) / field.length,
+    wobble: between(look.wobbleSpeed, spark.pick.wobbleSpeed),
+    twinkle: between(look.twinkleSpeed, spark.pick.twinkleSpeed),
+  };
+};
+
+export const clockAt = (field: SparkField, spark: Spark, time: number): SparkClock => {
+  const rates = sparkRates(field, spark);
+  return { drift: rates.drift * time, wobble: rates.wobble * time, twinkle: rates.twinkle * time };
+};
+
+export const keepClear = (field: SparkField, point: Point) =>
+  keepOutside(field.outline, point, tuning.sparkLook.margin);
+
+export const sparkPose = (field: SparkField, spark: Spark, clock: SparkClock, motion: number): SparkPose => {
+  const look = tuning.sparkLook;
+  const { pick } = spark;
+  const point = trackAt(field.track, triangle(spark.u + clock.drift));
+  const swing = between(look.wobble, pick.wobble);
+  const wobble = motion * swing * Math.sin(clock.wobble + spark.wobblePhase);
+  const offset = Math.max(0, look.offset + look.spread * pick.reach * pick.reach + wobble);
+  const flicker = between(look.twinkle, pick.twinkle);
+  const twinkle = motion * flicker * Math.sin(clock.twinkle + spark.twinklePhase);
   const { x, y } = keepClear(field, { x: point.x + point.nx * offset, y: point.y + point.ny * offset });
   return {
     x,
     y,
-    alpha: clamp01(spark.glow + twinkle) * edgeFade(field.crop, point),
+    alpha: clamp01(between(look.glow, pick.glow) + twinkle) * edgeFade(field.crop, point),
   };
 };

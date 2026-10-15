@@ -1,38 +1,68 @@
 "use client";
 
-import { button, LevaPanel, useControls, useCreateStore } from "leva";
+import { button, folder, LevaPanel, useControls, useCreateStore } from "leva";
 import { useEffect, useState } from "react";
 import { applyTuning, defaults, resetTuning, runAction, type Tuning, tuning } from "@/lib/tuning";
 import styles from "./Menu.module.css";
 
 type Store = ReturnType<typeof useCreateStore>;
 
+type Schema = Parameters<typeof folder>[0];
+
 type Range = { label: string; min: number; max: number; step: number };
 
-type Group = {
-  folder: string;
-  key: keyof Tuning;
-  ranges: Record<string, Range>;
-  actions?: Record<string, string>;
-};
+type Section = { title: string; key: keyof Tuning; ranges: Record<string, Range> };
+
+type Category = { folder: string; actions?: Record<string, string>; sections: Section[] };
 
 const STORAGE_KEY = "dev:tuning";
 const SAVE_DELAY = 200;
 
-const groups: Group[] = [
+const categories: Category[] = [
   {
     folder: "искры",
-    key: "sparks",
-    ranges: {
-      cursorRadius: { label: "радиус курсора", min: 0, max: 240, step: 1 },
-      push: { label: "толчок", min: 0, max: 20000, step: 100 },
-      spring: { label: "пружина", min: 1, max: 200, step: 1 },
-      damping: { label: "затухание", min: 0, max: 40, step: 0.5 },
-      burst: { label: "сила вспышки", min: 0, max: 5000, step: 50 },
-    },
     actions: { бахнуть: "sparks.burst" },
+    sections: [
+      {
+        title: "физика",
+        key: "sparks",
+        ranges: {
+          cursorRadius: { label: "радиус курсора", min: 0, max: 240, step: 1 },
+          push: { label: "толчок", min: 0, max: 20000, step: 100 },
+          spring: { label: "пружина", min: 1, max: 200, step: 1 },
+          damping: { label: "затухание", min: 0, max: 40, step: 0.5 },
+          burst: { label: "сила вспышки", min: 0, max: 5000, step: 50 },
+        },
+      },
+      {
+        title: "вид",
+        key: "sparkLook",
+        ranges: {
+          size: { label: "размер", min: 1, max: 40, step: 0.5 },
+          speed: { label: "скорость", min: 0, max: 200, step: 1 },
+          offset: { label: "отступ", min: 0, max: 200, step: 1 },
+          spread: { label: "разброс отступа", min: 0, max: 400, step: 1 },
+          margin: { label: "не ближе к контуру", min: 0, max: 120, step: 1 },
+          wobble: { label: "покачивание", min: 0, max: 80, step: 1 },
+          wobbleSpeed: { label: "темп покачивания", min: 0, max: 4, step: 0.05 },
+          glow: { label: "яркость", min: 0, max: 1, step: 0.01 },
+          twinkle: { label: "мерцание", min: 0, max: 1, step: 0.01 },
+          twinkleSpeed: { label: "темп мерцания", min: 0, max: 8, step: 0.05 },
+          heatGrow: { label: "рост от курсора", min: 0, max: 3, step: 0.05 },
+          heatGlow: { label: "свет от курсора", min: 0, max: 1, step: 0.01 },
+          heatDecay: { label: "остывание", min: 0.1, max: 12, step: 0.1 },
+        },
+      },
+    ],
   },
 ];
+
+type Value = number | number[];
+
+const same = (a: Value, b: Value) =>
+  Array.isArray(a) && Array.isArray(b) ? a.every((item, i) => item === b[i]) : a === b;
+
+const copy = (value: Value) => (Array.isArray(value) ? [...value] : value);
 
 const theme = {
   colors: {
@@ -94,36 +124,53 @@ const isTyping = (target: EventTarget | null) =>
   target instanceof HTMLElement &&
   (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName));
 
-function Controls({ store, group }: { store: Store; group: Group }) {
-  const values = tuning[group.key] as Record<string, number>;
-  const sliders = Object.fromEntries(
-    Object.entries(group.ranges).map(([key, range]) => [
-      key,
-      {
-        ...range,
-        value: values[key],
-        onChange: (value: number) => {
-          if (values[key] === value) return;
-          values[key] = value;
-          save();
-        },
-      },
-    ]),
+const update = (values: Record<string, Value>, key: string, value: Value) => {
+  if (same(values[key], value)) return;
+  values[key] = copy(value);
+  save();
+};
+
+const control = (values: Record<string, Value>, key: string, range: Range) => {
+  const current = values[key];
+  if (Array.isArray(current)) {
+    return {
+      ...range,
+      value: [current[0], current[1]] as [number, number],
+      onChange: (value: [number, number]) => update(values, key, value),
+    };
+  }
+  return { ...range, value: current, onChange: (value: number) => update(values, key, value) };
+};
+
+const sliders = (section: Section): Schema => {
+  const values = tuning[section.key] as Record<string, Value>;
+  return Object.fromEntries(
+    Object.entries(section.ranges).map(([key, range]) => [key, control(values, key, range)]),
   );
+};
+
+function Controls({ store, category }: { store: Store; category: Category }) {
   const buttons = Object.fromEntries(
-    Object.entries(group.actions ?? {}).map(([label, action]) => [label, button(() => runAction(action))]),
+    Object.entries(category.actions ?? {}).map(([label, action]) => [label, button(() => runAction(action))]),
   );
-  useControls(group.folder, { ...sliders, ...buttons }, { store });
+  const sections = Object.fromEntries(
+    category.sections.map((section) => [section.title, folder(sliders(section))]),
+  );
+  useControls(category.folder, { ...buttons, ...sections }, { store });
   return null;
 }
 
 const resetAll = (store: Store) => {
   resetTuning();
   forget();
-  const paths: Record<string, number> = {};
-  for (const group of groups) {
-    const values = defaults[group.key] as Record<string, number>;
-    for (const key of Object.keys(group.ranges)) paths[`${group.folder}.${key}`] = values[key];
+  const paths: Record<string, Value> = {};
+  for (const category of categories) {
+    for (const section of category.sections) {
+      const values = defaults[section.key] as Record<string, Value>;
+      for (const key of Object.keys(section.ranges)) {
+        paths[`${category.folder}.${section.title}.${key}`] = copy(values[key]);
+      }
+    }
   }
   store.set(paths, false);
 };
@@ -149,8 +196,8 @@ export function Menu() {
 
   return (
     <>
-      {groups.map((group) => (
-        <Controls key={group.key} store={store} group={group} />
+      {categories.map((category) => (
+        <Controls key={category.folder} store={store} category={category} />
       ))}
       <MenuActions store={store} />
       {open && (
