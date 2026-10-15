@@ -28,10 +28,6 @@
   border-radius: 10px;
 }
 
-.panel[hidden] {
-  display: none;
-}
-
 @media (max-width: 480px) {
   .panel {
     right: 0;
