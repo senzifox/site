@@ -37,8 +37,6 @@ cp .env.example .env.local
 pnpm dev
 ```
 
-the spotify and steam blocks need credentials in ; without them the blocks just stay idle.
-
 `.env.local` needs just for spotify and steam blocks, without them the blocks just stay idle
 
 | variable | where to get it |
