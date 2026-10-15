@@ -11,8 +11,9 @@ import { clamp01, smoothstep } from "@/lib/scroll";
 const COUNT = 22;
 const SEED = 0x5e2f0c;
 const TRACK_SAMPLES = 480;
-const FADE_FROM = 1000;
-const FADE_TO = 1180;
+const CROP_TOUCH = 2;
+const CROP_HIDE = 100;
+const CROP_FADE = 280;
 const SMOOTHING = 8;
 const MARGIN = 28;
 const TAU = Math.PI * 2;
@@ -32,7 +33,15 @@ export type Spark = {
   twinklePhase: number;
 };
 
-export type SparkField = { outline: Point[]; track: ContourSample[]; center: Point; sparks: Spark[] };
+type Crop = { size: number; left: boolean; right: boolean; top: boolean; bottom: boolean };
+
+export type SparkField = {
+  outline: Point[];
+  track: ContourSample[];
+  crop: Crop;
+  center: Point;
+  sparks: Spark[];
+};
 
 export type SparkPose = { x: number; y: number; alpha: number };
 
@@ -46,8 +55,28 @@ const random = (seed: number) => {
   };
 };
 
-const visibleArc = (samples: ContourSample[]) => {
-  const visible = samples.map(({ y }) => y < FADE_TO);
+const cropEdges = (outline: Point[], size: number): Crop => {
+  const xs = outline.map(({ x }) => x);
+  const ys = outline.map(({ y }) => y);
+  return {
+    size,
+    left: Math.min(...xs) < CROP_TOUCH,
+    right: Math.max(...xs) > size - CROP_TOUCH,
+    top: Math.min(...ys) < CROP_TOUCH,
+    bottom: Math.max(...ys) > size - CROP_TOUCH,
+  };
+};
+
+export const cropDistance = (crop: Crop, { x, y }: Point) =>
+  Math.min(
+    crop.left ? x : Number.POSITIVE_INFINITY,
+    crop.right ? crop.size - x : Number.POSITIVE_INFINITY,
+    crop.top ? y : Number.POSITIVE_INFINITY,
+    crop.bottom ? crop.size - y : Number.POSITIVE_INFINITY,
+  );
+
+const visibleArc = (samples: ContourSample[], crop: Crop) => {
+  const visible = samples.map((sample) => cropDistance(crop, sample) > CROP_HIDE);
   const firstHidden = visible.indexOf(false);
   if (firstHidden === -1) return samples;
   let best = { start: 0, length: 0 };
@@ -73,9 +102,10 @@ const arcLength = (points: Point[]) => {
   return total;
 };
 
-export const createSparkField = (d: string): SparkField => {
+export const createSparkField = (d: string, size: number): SparkField => {
   const outline = resampleClosed(outerContour(d), TRACK_SAMPLES);
-  const track = visibleArc(resampleClosed(smoothClosed(outline, SMOOTHING), TRACK_SAMPLES, SMOOTHING));
+  const crop = cropEdges(outline, size);
+  const track = visibleArc(resampleClosed(smoothClosed(outline, SMOOTHING), TRACK_SAMPLES, SMOOTHING), crop);
   const xs = outline.map(({ x }) => x);
   const ys = outline.map(({ y }) => y);
   const center = { x: (Math.min(...xs) + Math.max(...xs)) / 2, y: (Math.min(...ys) + Math.max(...ys)) / 2 };
@@ -100,7 +130,7 @@ export const createSparkField = (d: string): SparkField => {
     };
   });
 
-  return { outline, track, center, sparks };
+  return { outline, track, crop, center, sparks };
 };
 
 const triangle = (x: number) => {
@@ -123,7 +153,8 @@ const trackAt = (track: ContourSample[], u: number) => {
   };
 };
 
-const edgeFade = (y: number) => 1 - smoothstep(clamp01((y - FADE_FROM) / (FADE_TO - FADE_FROM)));
+const edgeFade = (crop: Crop, point: Point) =>
+  smoothstep(clamp01((cropDistance(crop, point) - CROP_HIDE) / (CROP_FADE - CROP_HIDE)));
 
 export const keepClear = (field: SparkField, point: Point) => keepOutside(field.outline, point, MARGIN);
 
@@ -136,6 +167,6 @@ export const sparkPose = (field: SparkField, spark: Spark, time: number, motion:
   return {
     x,
     y,
-    alpha: clamp01(spark.glow + twinkle) * edgeFade(point.y),
+    alpha: clamp01(spark.glow + twinkle) * edgeFade(field.crop, point),
   };
 };

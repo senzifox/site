@@ -1,11 +1,39 @@
 .root {
   position: relative;
   display: block;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.avatar {
+.flippable {
+  perspective: 900px;
+}
+
+.flipper {
+  position: relative;
+  display: block;
+  transform-style: preserve-3d;
+}
+
+.face {
   display: block;
   overflow: visible;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.back {
+  position: absolute;
+  inset: 0;
+  transform: rotateY(180deg);
+  visibility: hidden;
 }
 
 .outline {
