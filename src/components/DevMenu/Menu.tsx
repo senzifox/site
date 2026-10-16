@@ -11,7 +11,7 @@ type Schema = Parameters<typeof folder>[0];
 
 type Range = { label: string; min: number; max: number; step: number };
 
-type Section = { title: string; key: keyof Tuning; ranges: Record<string, Range> };
+type Section = { title: string; key: keyof Tuning; apply?: string; ranges: Record<string, Range> };
 
 type Category = { folder: string; actions?: Record<string, string>; sections: Section[] };
 
@@ -51,6 +51,19 @@ const categories: Category[] = [
           heatGrow: { label: "рост от курсора", min: 0, max: 3, step: 0.05 },
           heatGlow: { label: "свет от курсора", min: 0, max: 1, step: 0.01 },
           heatDecay: { label: "остывание", min: 0.1, max: 12, step: 0.1 },
+        },
+      },
+      {
+        title: "раскладка",
+        key: "sparkLayout",
+        apply: "sparks.layout",
+        ranges: {
+          count: { label: "количество", min: 1, max: 80, step: 1 },
+          trackSamples: { label: "точек контура", min: 60, max: 1500, step: 10 },
+          smoothing: { label: "сглаживание", min: 1, max: 40, step: 1 },
+          cropTouch: { label: "касание края", min: 0, max: 40, step: 1 },
+          cropHide: { label: "скрыть у края", min: 0, max: 400, step: 5 },
+          cropFade: { label: "затухание у края", min: 1, max: 600, step: 5 },
         },
       },
     ],
@@ -118,36 +131,43 @@ const forget = () => {
   }
 };
 
+const applyAll = () => {
+  for (const category of categories) {
+    for (const { apply } of category.sections) if (apply) runAction(apply);
+  }
+};
+
 restore();
+applyAll();
 
 const isTyping = (target: EventTarget | null) =>
   target instanceof HTMLElement &&
   (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName));
 
-const update = (values: Record<string, Value>, key: string, value: Value) => {
+const update = (section: Section, key: string, value: Value) => {
+  const values = tuning[section.key] as Record<string, Value>;
   if (same(values[key], value)) return;
   values[key] = copy(value);
   save();
+  if (section.apply) runAction(section.apply);
 };
 
-const control = (values: Record<string, Value>, key: string, range: Range) => {
-  const current = values[key];
+const control = (section: Section, key: string, range: Range) => {
+  const current = (tuning[section.key] as Record<string, Value>)[key];
   if (Array.isArray(current)) {
     return {
       ...range,
       value: [current[0], current[1]] as [number, number],
-      onChange: (value: [number, number]) => update(values, key, value),
+      onChange: (value: [number, number]) => update(section, key, value),
     };
   }
-  return { ...range, value: current, onChange: (value: number) => update(values, key, value) };
+  return { ...range, value: current, onChange: (value: number) => update(section, key, value) };
 };
 
-const sliders = (section: Section): Schema => {
-  const values = tuning[section.key] as Record<string, Value>;
-  return Object.fromEntries(
-    Object.entries(section.ranges).map(([key, range]) => [key, control(values, key, range)]),
+const sliders = (section: Section): Schema =>
+  Object.fromEntries(
+    Object.entries(section.ranges).map(([key, range]) => [key, control(section, key, range)]),
   );
-};
 
 function Controls({ store, category }: { store: Store; category: Category }) {
   const buttons = Object.fromEntries(
@@ -173,6 +193,7 @@ const resetAll = (store: Store) => {
     }
   }
   store.set(paths, false);
+  applyAll();
 };
 
 function MenuActions({ store }: { store: Store }) {

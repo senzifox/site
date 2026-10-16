@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { pointer, subscribePointer } from "@/lib/pointer";
 import { clamp01, smoothstep } from "@/lib/scroll";
 import { registerAction, tuning } from "@/lib/tuning";
@@ -10,13 +10,15 @@ import {
   clockAt,
   createSparkField,
   keepClear,
+  type Spark,
+  type SparkClock,
   type SparkField,
+  type SparkLayout,
   sparkPose,
   sparkRates,
   sparkSize,
 } from "./sparks";
 
-const fields = avatars.map(({ d, size }) => createSparkField(d, size));
 const [{ size }] = avatars;
 
 const WARMUP = 1.4;
@@ -24,39 +26,89 @@ const MAX_STEP = 0.05;
 const SETTLE = 0.8;
 const RETARGET_BURST = 0.5;
 
-const initial = fields[0].sparks.map((spark) => ({
-  spark,
-  pose: sparkPose(fields[0], spark, clockAt(fields[0], spark, 0), 0),
-}));
+let built = { key: "", fields: [] as SparkField[] };
+
+const buildFields = (layout: SparkLayout) => {
+  const key = JSON.stringify(layout);
+  if (key !== built.key) built = { key, fields: avatars.map(({ d }) => createSparkField(d, size, layout)) };
+  return built.fields;
+};
+
+const currentFields = () => buildFields(tuning.sparkLayout);
+
+type SparkState = {
+  x: number;
+  y: number;
+  dx: number;
+  dy: number;
+  vx: number;
+  vy: number;
+  heat: number;
+  clock: SparkClock;
+};
+
+type Carry = { time: number; face: number; state: SparkState[] };
+
+type Paint = { cx: string; cy: string; r: string; opacity: string };
+
+const painted = new Map<number, Paint>();
+
+const paintOnce = (field: SparkField, spark: Spark) => {
+  const known = painted.get(spark.id);
+  if (known) return known;
+  const pose = sparkPose(field, spark, clockAt(field, spark, 0), 0);
+  const paint = {
+    cx: pose.x.toFixed(1),
+    cy: pose.y.toFixed(1),
+    r: sparkSize(spark).toFixed(1),
+    opacity: pose.alpha.toFixed(2),
+  };
+  painted.set(spark.id, paint);
+  return paint;
+};
 
 type Props = { face: number; burst: number };
 
 export function Sparks({ face, burst }: Props) {
   const layer = useRef<SVGSVGElement>(null);
   const actions = useRef({ burst: () => {}, retarget: (_index: number) => {} });
+  const carry = useRef<Carry | null>(null);
+  const [fields, setFields] = useState(currentFields);
+
+  useEffect(() => registerAction("sparks.layout", () => setFields(currentFields())), []);
 
   useEffect(() => {
     const svg = layer.current;
     if (!svg) return;
     const circles = [...svg.querySelectorAll("circle")];
-    const state = initial.map(({ pose }) => ({
-      x: pose.x,
-      y: pose.y,
-      dx: 0,
-      dy: 0,
-      vx: 0,
-      vy: 0,
-      heat: 0,
-      clock: { drift: 0, wobble: 0, twinkle: 0 },
-    }));
     const reduced = matchMedia("(prefers-reduced-motion: reduce)");
-    let field: SparkField = fields[0];
-    let settle = 1;
-    let time = 0;
+    const previous = carry.current;
+    let face = previous?.face ?? 0;
+    let field: SparkField = fields[face] ?? fields[0];
+    let settle = previous ? 0 : 1;
+    let time = previous?.time ?? 0;
     let last = 0;
     let frame = 0;
 
     const motionAt = () => smoothstep(clamp01(time / WARMUP));
+
+    const state = field.sparks.map((spark, i): SparkState => {
+      const from = previous?.state[i];
+      const clock = from ? { ...from.clock } : { drift: 0, wobble: 0, twinkle: 0 };
+      const pose = sparkPose(field, spark, clock, motionAt());
+      const x = from && !reduced.matches ? from.x : pose.x;
+      const y = from && !reduced.matches ? from.y : pose.y;
+      return {
+        x,
+        y,
+        dx: x - pose.x,
+        dy: y - pose.y,
+        vx: from?.vx ?? 0,
+        vy: from?.vy ?? 0,
+        heat: from?.heat ?? 0,
+        clock,
+      };
+    });
 
     const step = (dt: number) => {
       const motion = motionAt();
@@ -162,6 +214,7 @@ export function Sparks({ face, burst }: Props) {
           s.dy = reduced.matches ? 0 : s.y - target.y;
         }
         field = next;
+        face = index;
         if (reduced.matches) {
           step(0);
           return;
@@ -172,6 +225,7 @@ export function Sparks({ face, burst }: Props) {
       },
     };
 
+    step(0);
     wake();
     const release = subscribePointer(wake);
     const unregister = registerAction("sparks.burst", () => actions.current.burst());
@@ -179,12 +233,13 @@ export function Sparks({ face, burst }: Props) {
 
     return () => {
       sleep();
+      carry.current = { time, face, state };
       actions.current = { burst: () => {}, retarget: () => {} };
       release();
       unregister();
       reduced.removeEventListener("change", onMotionChange);
     };
-  }, []);
+  }, [fields]);
 
   useEffect(() => actions.current.retarget(face), [face]);
 
@@ -194,15 +249,8 @@ export function Sparks({ face, burst }: Props) {
 
   return (
     <svg ref={layer} className={styles.sparks} viewBox={`0 0 ${size} ${size}`} aria-hidden="true">
-      {initial.map(({ spark, pose }) => (
-        <circle
-          key={spark.id}
-          className={styles.spark}
-          cx={pose.x.toFixed(1)}
-          cy={pose.y.toFixed(1)}
-          r={sparkSize(spark).toFixed(1)}
-          opacity={pose.alpha.toFixed(2)}
-        />
+      {fields[0].sparks.map((spark) => (
+        <circle key={spark.id} className={styles.spark} {...paintOnce(fields[0], spark)} />
       ))}
     </svg>
   );

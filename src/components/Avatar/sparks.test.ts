@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { contains } from "@/lib/contour";
+import { defaults } from "@/lib/tuning";
 import { avatars } from "./silhouette";
 import { clockAt, createSparkField, cropDistance, sparkPose } from "./sparks";
 
@@ -31,6 +32,27 @@ describe.each(avatars.map((avatar, i) => [i + 1, avatar] as const))("avatar %i",
     const still = sparkPose(field, spark, clockAt(field, spark, 0), 0);
     expect(sparkPose(field, spark, clockAt(field, spark, 0), 0)).toEqual(still);
     expect(sparkPose(field, spark, clockAt(field, spark, 7), 0)).not.toEqual(still);
+  });
+});
+
+describe("layout", () => {
+  const [{ d, size }] = avatars;
+
+  it("follows the tuned count", () => {
+    expect(createSparkField(d, size, { ...defaults.sparkLayout, count: 5 }).sparks).toHaveLength(5);
+  });
+
+  it("rounds fractional slider values", () => {
+    const field = createSparkField(d, size, { ...defaults.sparkLayout, count: 7.4, trackSamples: 300.2 });
+    expect(field.sparks).toHaveLength(7);
+    expect(field.outline).toHaveLength(300);
+  });
+
+  it("keeps a usable track when the edge hides everything", () => {
+    const field = createSparkField(d, size, { ...defaults.sparkLayout, cropHide: 5000 });
+    expect(field.track.length).toBeGreaterThan(1);
+    const [spark] = field.sparks;
+    expect(Number.isFinite(sparkPose(field, spark, clockAt(field, spark, 3), 1).x)).toBe(true);
   });
 });
 

@@ -7,15 +7,9 @@ import {
   smoothClosed,
 } from "@/lib/contour";
 import { clamp01, smoothstep } from "@/lib/scroll";
-import { tuning } from "@/lib/tuning";
+import { defaults, type Tuning, tuning } from "@/lib/tuning";
 
-const COUNT = 22;
 const SEED = 0x5e2f0c;
-const TRACK_SAMPLES = 480;
-const CROP_TOUCH = 2;
-const CROP_HIDE = 100;
-const CROP_FADE = 280;
-const SMOOTHING = 8;
 const TAU = Math.PI * 2;
 
 type Pick = {
@@ -40,7 +34,17 @@ export type Spark = {
 
 export type SparkClock = { drift: number; wobble: number; twinkle: number };
 
-type Crop = { size: number; left: boolean; right: boolean; top: boolean; bottom: boolean };
+export type SparkLayout = Tuning["sparkLayout"];
+
+type Crop = {
+  size: number;
+  hide: number;
+  fade: number;
+  left: boolean;
+  right: boolean;
+  top: boolean;
+  bottom: boolean;
+};
 
 export type SparkField = {
   outline: Point[];
@@ -63,15 +67,18 @@ const random = (seed: number) => {
   };
 };
 
-const cropEdges = (outline: Point[], size: number): Crop => {
+const cropEdges = (outline: Point[], size: number, layout: SparkLayout): Crop => {
   const xs = outline.map(({ x }) => x);
   const ys = outline.map(({ y }) => y);
+  const touch = layout.cropTouch;
   return {
     size,
-    left: Math.min(...xs) < CROP_TOUCH,
-    right: Math.max(...xs) > size - CROP_TOUCH,
-    top: Math.min(...ys) < CROP_TOUCH,
-    bottom: Math.max(...ys) > size - CROP_TOUCH,
+    hide: layout.cropHide,
+    fade: Math.max(1, layout.cropFade),
+    left: Math.min(...xs) < touch,
+    right: Math.max(...xs) > size - touch,
+    top: Math.min(...ys) < touch,
+    bottom: Math.max(...ys) > size - touch,
   };
 };
 
@@ -84,7 +91,7 @@ export const cropDistance = (crop: Crop, { x, y }: Point) =>
   );
 
 const visibleArc = (samples: ContourSample[], crop: Crop) => {
-  const visible = samples.map((sample) => cropDistance(crop, sample) > CROP_HIDE);
+  const visible = samples.map((sample) => cropDistance(crop, sample) > crop.hide);
   const firstHidden = visible.indexOf(false);
   if (firstHidden === -1) return samples;
   let best = { start: 0, length: 0 };
@@ -94,6 +101,7 @@ const visibleArc = (samples: ContourSample[], crop: Crop) => {
     run = visible[i] ? run + 1 : 0;
     if (run > best.length) best = { start: i - run + 1, length: run };
   }
+  if (best.length < 2) return samples;
   return Array.from(
     { length: best.length },
     (_, k) => samples[(best.start + k + samples.length) % samples.length],
@@ -110,19 +118,26 @@ const arcLength = (points: Point[]) => {
   return total;
 };
 
-export const createSparkField = (d: string, size: number): SparkField => {
-  const outline = resampleClosed(outerContour(d), TRACK_SAMPLES);
-  const crop = cropEdges(outline, size);
-  const track = visibleArc(resampleClosed(smoothClosed(outline, SMOOTHING), TRACK_SAMPLES, SMOOTHING), crop);
+export const createSparkField = (
+  d: string,
+  size: number,
+  layout: SparkLayout = defaults.sparkLayout,
+): SparkField => {
+  const count = Math.max(1, Math.round(layout.count));
+  const samples = Math.max(8, Math.round(layout.trackSamples));
+  const smoothing = Math.max(1, Math.min(Math.round(layout.smoothing), Math.floor((samples - 1) / 2)));
+  const outline = resampleClosed(outerContour(d), samples);
+  const crop = cropEdges(outline, size, layout);
+  const track = visibleArc(resampleClosed(smoothClosed(outline, smoothing), samples, smoothing), crop);
   const xs = outline.map(({ x }) => x);
   const ys = outline.map(({ y }) => y);
   const center = { x: (Math.min(...xs) + Math.max(...xs)) / 2, y: (Math.min(...ys) + Math.max(...ys)) / 2 };
   const length = arcLength(track);
   const rnd = random(SEED);
 
-  const sparks = Array.from({ length: COUNT }, (_, id): Spark => {
+  const sparks = Array.from({ length: count }, (_, id): Spark => {
     const reach = rnd();
-    const u = (id + 0.1 + rnd() * 0.8) / COUNT;
+    const u = (id + 0.1 + rnd() * 0.8) / count;
     const direction = rnd() < 0.5 ? -1 : 1;
     const speed = rnd();
     const size = rnd();
@@ -167,7 +182,7 @@ const trackAt = (track: ContourSample[], u: number) => {
 };
 
 const edgeFade = (crop: Crop, point: Point) =>
-  smoothstep(clamp01((cropDistance(crop, point) - CROP_HIDE) / (CROP_FADE - CROP_HIDE)));
+  smoothstep(clamp01((cropDistance(crop, point) - crop.hide) / crop.fade));
 
 const between = ([min, max]: number[], t: number) => min + (max - min) * t;
 

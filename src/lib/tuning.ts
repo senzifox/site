@@ -15,6 +15,7 @@ export const defaults = {
     heatGlow: 0.5,
     heatDecay: 3,
   },
+  sparkLayout: { count: 22, trackSamples: 480, smoothing: 8, cropTouch: 2, cropHide: 100, cropFade: 180 },
 };
 
 export type Tuning = typeof defaults;
