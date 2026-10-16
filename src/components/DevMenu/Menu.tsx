@@ -41,6 +41,15 @@ const isTyping = (target: EventTarget | null) =>
   target instanceof HTMLElement &&
   (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName));
 
+const CHANGES = "изменено";
+const CHANGES_DELAY = 150;
+
+const changeListeners = new Set<() => void>();
+
+const announceChange = () => {
+  for (const listener of changeListeners) listener();
+};
+
 const update = (section: Section, key: string, value: Value) => {
   const values = tuning[section.key] as Record<string, Value>;
   if (same(values[key], value)) return;
@@ -48,6 +57,7 @@ const update = (section: Section, key: string, value: Value) => {
   save();
   paintStyle();
   if (section.apply) runAction(section.apply);
+  announceChange();
 };
 
 const control = (section: Section, key: string, range: Range) => {
@@ -138,7 +148,68 @@ const resetAll = (store: Store) => {
   }
   store.set(paths, false);
   applyAll();
+  announceChange();
 };
+
+const formatNumber = (value: number) => String(Number(value.toFixed(3))).replace(".", ",");
+
+const formatValue = (value: Value) =>
+  Array.isArray(value) ? value.map(formatNumber).join("–") : formatNumber(value);
+
+const resetFields = (store: Store, category: Category, section: Section, keys: string[]) => {
+  const values = defaults[section.key] as Record<string, Value>;
+  const paths: Record<string, Value> = {};
+  for (const key of keys) {
+    update(section, key, values[key]);
+    paths[controlPath(category, section, key)] = copy(values[key]);
+  }
+  store.set(paths, false);
+};
+
+const changedKeys = (section: Section) => {
+  const current = tuning[section.key] as Record<string, Value>;
+  const initial = defaults[section.key] as Record<string, Value>;
+  return Object.keys(section.ranges).filter((key) => !same(current[key], initial[key]));
+};
+
+const changesSchema = (store: Store): Schema => {
+  const schema: Schema = {};
+  for (const category of categories) {
+    for (const section of category.sections) {
+      const keys = changedKeys(section);
+      if (keys.length > 1) {
+        schema[`↺ ${section.title}: весь раздел`] = button(() => resetFields(store, category, section, keys));
+      }
+      for (const key of keys) {
+        const current = (tuning[section.key] as Record<string, Value>)[key];
+        const initial = (defaults[section.key] as Record<string, Value>)[key];
+        const label = `↺ ${section.title} · ${section.ranges[key].label}: ${formatValue(current)} → ${formatValue(initial)}`;
+        schema[label] = button(() => resetFields(store, category, section, [key]));
+      }
+    }
+  }
+  return schema;
+};
+
+function Changes({ store }: { store: Store }) {
+  const [version, setVersion] = useState(0);
+
+  useEffect(() => {
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const listener = () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => setVersion((current) => current + 1), CHANGES_DELAY);
+    };
+    changeListeners.add(listener);
+    return () => {
+      clearTimeout(timer);
+      changeListeners.delete(listener);
+    };
+  }, []);
+
+  useControls(CHANGES, () => changesSchema(store), { store }, [version]);
+  return null;
+}
 
 function MenuActions({ store }: { store: Store }) {
   useControls({ "сбросить всё": button(() => resetAll(store)) }, { store });
@@ -166,6 +237,7 @@ export function Menu() {
         <Controls key={category.folder} store={store} category={category} />
       ))}
       <Colors store={store} />
+      <Changes store={store} />
       <MenuActions store={store} />
       {open && (
         <div className={styles.panel} data-dev-menu="">
