@@ -1,9 +1,9 @@
 import { useId } from "react";
+import { defaults } from "@/lib/tuning";
 import styles from "./Footer.module.css";
-import { PauseOnReducedMotion } from "./PauseOnReducedMotion";
+import { TailMotion } from "./TailMotion";
 import { tail } from "./tail";
 
-const DURATION = "3.2s";
 const EASE = Array.from({ length: tail.shapes.length - 1 }, () => "0.45 0 0.55 1").join(";");
 
 function Morph({ frames }: { frames: string[] }) {
@@ -14,7 +14,7 @@ function Morph({ frames }: { frames: string[] }) {
       keyTimes={tail.keyTimes}
       keySplines={EASE}
       calcMode="spline"
-      dur={DURATION}
+      dur={`${defaults.tail.seconds}s`}
       repeatCount="indefinite"
     />
   );
@@ -27,7 +27,7 @@ export function Tail() {
   const clipId = `${id}-clip`;
 
   return (
-    <PauseOnReducedMotion className={styles.tailWrap}>
+    <TailMotion className={styles.tailWrap}>
       <svg
         className={styles.tail}
         viewBox={`0 0 ${tail.width} ${tail.height}`}
@@ -51,6 +51,6 @@ export function Tail() {
           </path>
         </g>
       </svg>
-    </PauseOnReducedMotion>
+    </TailMotion>
   );
 }

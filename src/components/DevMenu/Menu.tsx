@@ -150,6 +150,27 @@ const categories: Category[] = [
       },
     ],
   },
+  {
+    folder: "шапка и футер",
+    sections: [
+      {
+        title: "сменяемая строка",
+        key: "header",
+        ranges: {
+          showMs: { label: "показ, мс", min: 500, max: 15000, step: 100 },
+          fadeMs: { label: "смена, мс", min: 0, max: 3000, step: 50 },
+        },
+      },
+      {
+        title: "хвост",
+        key: "tail",
+        apply: "tail.tempo",
+        ranges: {
+          seconds: { label: "цикл, с", min: 0.5, max: 12, step: 0.1 },
+        },
+      },
+    ],
+  },
 ];
 
 type Value = number | number[];

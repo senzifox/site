@@ -1,8 +1,9 @@
 "use client";
 
 import { type ReactNode, useEffect, useRef } from "react";
+import { registerAction, tuning } from "@/lib/tuning";
 
-export function PauseOnReducedMotion({ className, children }: { className?: string; children: ReactNode }) {
+export function TailMotion({ className, children }: { className?: string; children: ReactNode }) {
   const root = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
@@ -19,7 +20,14 @@ export function PauseOnReducedMotion({ className, children }: { className?: stri
     };
     sync();
     query.addEventListener("change", sync);
-    return () => query.removeEventListener("change", sync);
+    const release = registerAction("tail.tempo", () => {
+      for (const animate of svg.querySelectorAll("animate"))
+        animate.setAttribute("dur", `${tuning.tail.seconds}s`);
+    });
+    return () => {
+      query.removeEventListener("change", sync);
+      release();
+    };
   }, []);
 
   return (

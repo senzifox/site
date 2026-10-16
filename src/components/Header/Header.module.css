@@ -57,7 +57,7 @@
 
 .rotating {
   display: inline-block;
-  transition: opacity 600ms ease-in-out;
+  transition: opacity var(--rotate-fade) ease-in-out;
 }
 
 .hidden {
