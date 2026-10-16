@@ -1,11 +1,12 @@
 import type { Metadata, Viewport } from "next";
 import { JetBrains_Mono, Roboto_Flex } from "next/font/google";
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { CardGlow } from "@/components/Card/CardGlow";
 import { DevMenu } from "@/components/DevMenu/DevMenu";
 import { site } from "@/content/site";
 import { theme } from "@/content/theme";
 import { personJsonLd } from "@/lib/jsonLd";
+import { defaults, tuningStyle } from "@/lib/tuning";
 import "./globals.css";
 
 const sans = Roboto_Flex({
@@ -46,7 +47,11 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="ru" className={`${sans.variable} ${mono.variable}`}>
+    <html
+      lang="ru"
+      className={`${sans.variable} ${mono.variable}`}
+      style={tuningStyle(defaults) as CSSProperties}
+    >
       <body suppressHydrationWarning>
         <script
           type="application/ld+json"

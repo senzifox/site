@@ -37,8 +37,8 @@
   padding: 1px;
   border-radius: calc(var(--radius-card) + 1px);
   background: radial-gradient(
-    200px circle at var(--glow-x, -999px) var(--glow-y, -999px),
-    color-mix(in srgb, var(--accent) 75%, transparent),
+    var(--card-ring-size) circle at var(--glow-x, -999px) var(--glow-y, -999px),
+    color-mix(in srgb, var(--accent) var(--card-ring-strength), transparent),
     transparent 70%
   );
   -webkit-mask:
@@ -56,8 +56,8 @@
   z-index: -1;
   border-radius: inherit;
   background: radial-gradient(
-    260px circle at var(--glow-x, -999px) var(--glow-y, -999px),
-    rgb(var(--glow) / 0.1),
+    var(--card-fill-size) circle at var(--glow-x, -999px) var(--glow-y, -999px),
+    rgb(var(--glow) / var(--card-fill-strength)),
     transparent 70%
   );
 }

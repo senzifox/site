@@ -27,11 +27,23 @@ export const defaults = {
     forthMs: 380,
     settleMs: 460,
   },
+  flashlight: { size: 320, strength: 1, falloff: 0.35, falloffAt: 55 },
+  cardGlow: { ring: 200, ringStrength: 0.75, fill: 260, fillStrength: 0.1 },
 };
 
 export type Tuning = typeof defaults;
 
 export const tuning: Tuning = structuredClone(defaults);
+
+export const tuningStyle = ({ flashlight, cardGlow }: Tuning = tuning): Record<`--${string}`, string> => ({
+  "--spot-strength": `${flashlight.strength}`,
+  "--spot-falloff": `${flashlight.falloff}`,
+  "--spot-falloff-at": `${flashlight.falloffAt}%`,
+  "--card-ring-size": `${cardGlow.ring}px`,
+  "--card-ring-strength": `${cardGlow.ringStrength * 100}%`,
+  "--card-fill-size": `${cardGlow.fill}px`,
+  "--card-fill-strength": `${cardGlow.fillStrength}`,
+});
 
 type Bag = Record<string, unknown>;
 

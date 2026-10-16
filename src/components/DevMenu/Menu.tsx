@@ -2,7 +2,15 @@
 
 import { button, folder, LevaPanel, useControls, useCreateStore } from "leva";
 import { useEffect, useState } from "react";
-import { applyTuning, defaults, resetTuning, runAction, type Tuning, tuning } from "@/lib/tuning";
+import {
+  applyTuning,
+  defaults,
+  resetTuning,
+  runAction,
+  type Tuning,
+  tuning,
+  tuningStyle,
+} from "@/lib/tuning";
 import styles from "./Menu.module.css";
 
 type Store = ReturnType<typeof useCreateStore>;
@@ -96,6 +104,31 @@ const categories: Category[] = [
       },
     ],
   },
+  {
+    folder: "эффекты",
+    sections: [
+      {
+        title: "фонарик",
+        key: "flashlight",
+        ranges: {
+          size: { label: "размер", min: 40, max: 1000, step: 10 },
+          strength: { label: "яркость", min: 0, max: 1, step: 0.01 },
+          falloff: { label: "яркость к краю", min: 0, max: 1, step: 0.01 },
+          falloffAt: { label: "где край, %", min: 1, max: 99, step: 1 },
+        },
+      },
+      {
+        title: "подсветка карточек",
+        key: "cardGlow",
+        ranges: {
+          ring: { label: "радиус рамки", min: 0, max: 600, step: 5 },
+          ringStrength: { label: "яркость рамки", min: 0, max: 1, step: 0.01 },
+          fill: { label: "радиус пятна", min: 0, max: 800, step: 5 },
+          fillStrength: { label: "яркость пятна", min: 0, max: 0.5, step: 0.005 },
+        },
+      },
+    ],
+  },
 ];
 
 type Value = number | number[];
@@ -159,7 +192,13 @@ const forget = () => {
   }
 };
 
+const paintStyle = () => {
+  for (const [name, value] of Object.entries(tuningStyle()))
+    document.documentElement.style.setProperty(name, value);
+};
+
 const applyAll = () => {
+  paintStyle();
   for (const category of categories) {
     for (const { apply } of category.sections) if (apply) runAction(apply);
   }
@@ -177,6 +216,7 @@ const update = (section: Section, key: string, value: Value) => {
   if (same(values[key], value)) return;
   values[key] = copy(value);
   save();
+  paintStyle();
   if (section.apply) runAction(section.apply);
 };
 
