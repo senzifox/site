@@ -1,6 +1,6 @@
 "use client";
 
-import { button, folder, LevaPanel, useControls, useCreateStore } from "leva";
+import { button, folder, LevaPanel, monitor, useControls, useCreateStore } from "leva";
 import { useEffect, useState } from "react";
 import { clock, setClock, subscribeClock, timeScale } from "@/lib/clock";
 import {
@@ -364,8 +364,25 @@ const syncAnimations = () => {
 subscribeClock(syncAnimations);
 
 const TOOLS = "время";
+const FPS_SMOOTHING = 0.1;
+const FPS_INTERVAL = 100;
+
+const fps = { value: 0 };
+
+const measureFps = () => {
+  let frame = 0;
+  let last = 0;
+  const tick = (now: number) => {
+    if (last) fps.value += (1000 / (now - last) - fps.value) * FPS_SMOOTHING;
+    last = now;
+    frame = requestAnimationFrame(tick);
+  };
+  frame = requestAnimationFrame(tick);
+  return () => cancelAnimationFrame(frame);
+};
 
 function Tools({ store }: { store: Store }) {
+  useEffect(measureFps, []);
   useControls(
     TOOLS,
     {
@@ -378,6 +395,8 @@ function Tools({ store }: { store: Store }) {
         onChange: (scale: number) => setClock({ scale }),
       },
       paused: { label: "пауза", value: clock.paused, onChange: (paused: boolean) => setClock({ paused }) },
+      fps: monitor(() => Math.round(fps.value), { interval: FPS_INTERVAL }),
+      график: monitor(() => fps.value, { graph: true, interval: FPS_INTERVAL }),
     },
     { store },
   );
