@@ -3,7 +3,7 @@
 import { button, folder, LevaPanel, monitor, useControls, useCreateStore } from "leva";
 import { useEffect, useState } from "react";
 import { clock, setClock, subscribeClock } from "@/lib/clock";
-import { defaults, resetTuning, runAction, tuning, tuningStyle } from "@/lib/tuning";
+import { applyTuning, defaults, resetTuning, runAction, tuning, tuningStyle } from "@/lib/tuning";
 import { type Category, categories, controlKey, controlPath, type Range, type Section } from "./categories";
 import { COLORS, colorKey, paintColor, swatches, toHex } from "./colors";
 import styles from "./Menu.module.css";
@@ -127,6 +127,27 @@ function Tools({ store }: { store: Store }) {
   return null;
 }
 
+const showTuning = (store: Store) => {
+  const paths: Record<string, Value> = {};
+  for (const category of categories) {
+    for (const section of category.sections) {
+      const values = tuning[section.key] as Record<string, Value>;
+      for (const key of Object.keys(section.ranges))
+        paths[controlPath(category, section, key)] = copy(values[key]);
+    }
+  }
+  store.set(paths, false);
+  applyAll();
+  announceChange();
+};
+
+const loadTuning = (store: Store, values: unknown) => {
+  resetTuning();
+  applyTuning(values);
+  save();
+  showTuning(store);
+};
+
 const resetAll = (store: Store) => {
   resetTuning();
   forget();
@@ -139,16 +160,8 @@ const resetAll = (store: Store) => {
     document.documentElement.style.removeProperty(swatch.name);
     paths[`${COLORS}.${colorKey(swatch)}`] = toHex(swatch);
   }
-  for (const category of categories) {
-    for (const section of category.sections) {
-      const values = defaults[section.key] as Record<string, Value>;
-      for (const key of Object.keys(section.ranges))
-        paths[controlPath(category, section, key)] = copy(values[key]);
-    }
-  }
   store.set(paths, false);
-  applyAll();
-  announceChange();
+  showTuning(store);
 };
 
 const formatNumber = (value: number) => String(Number(value.toFixed(3))).replace(".", ",");
@@ -232,11 +245,89 @@ const writeToCode = async () => {
   }
 };
 
+const PRESETS = "пресеты";
+const PRESETS_URL = "/api/dev/presets";
+
+let presets: Record<string, unknown> = {};
+
+const requestPresets = async (init?: RequestInit, query = "") => {
+  const response = await fetch(`${PRESETS_URL}${query}`, init);
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  presets = (await response.json()) as Record<string, unknown>;
+  return Object.keys(presets);
+};
+
+const failure = (error: unknown) => `не вышло: ${error instanceof Error ? error.message : String(error)}`;
+
+function Presets({ store }: { store: Store }) {
+  const [names, setNames] = useState<string[]>([]);
+
+  useEffect(() => {
+    requestPresets().then(setNames, (error) => {
+      writeStatus.text = failure(error);
+    });
+  }, []);
+
+  const run = async (task: () => Promise<string[]>, done: string) => {
+    try {
+      setNames(await task());
+      writeStatus.text = done;
+    } catch (error) {
+      writeStatus.text = failure(error);
+    }
+  };
+
+  const typed = () => String(store.get(`${PRESETS}.название`) ?? "").trim();
+  const picked = () => String(store.get(`${PRESETS}.пресет`) ?? "");
+
+  useControls(
+    PRESETS,
+    () => ({
+      название: { value: "" },
+      сохранить: button(() => {
+        const name = typed();
+        if (!name) {
+          writeStatus.text = "нужно название";
+          return;
+        }
+        run(
+          () =>
+            requestPresets({
+              method: "PUT",
+              headers: { "content-type": "application/json" },
+              body: JSON.stringify({ name, values: tuning }),
+            }),
+          `пресет «${name}» сохранён`,
+        );
+      }),
+      ...(names.length > 0 && {
+        пресет: { options: names, value: names[0] },
+        загрузить: button(() => {
+          const name = picked();
+          if (!(name in presets)) return;
+          loadTuning(store, presets[name]);
+          writeStatus.text = `пресет «${name}» загружен`;
+        }),
+        удалить: button(() => {
+          const name = picked();
+          run(
+            () => requestPresets({ method: "DELETE" }, `?name=${encodeURIComponent(name)}`),
+            `пресет «${name}» удалён`,
+          );
+        }),
+      }),
+    }),
+    { store },
+    [names.join("\n")],
+  );
+  return null;
+}
+
 function MenuActions({ store }: { store: Store }) {
   useControls(
     {
       "записать в код": button(writeToCode),
-      запись: monitor(() => writeStatus.text, { interval: STATUS_INTERVAL }),
+      статус: monitor(() => writeStatus.text, { interval: STATUS_INTERVAL }),
       "сбросить всё": button(() => resetAll(store)),
     },
     { store },
@@ -266,6 +357,7 @@ export function Menu() {
       ))}
       <Colors store={store} />
       <Changes store={store} />
+      <Presets store={store} />
       <MenuActions store={store} />
       {open && (
         <div className={styles.panel} data-dev-menu="">
