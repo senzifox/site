@@ -86,7 +86,7 @@ export const categories: Category[] = [
   },
   {
     folder: "эффекты",
-    actions: { "вспышка копирования": "copy.burst" },
+    actions: { "показать вспышку": "copy.burst" },
     sections: [
       {
         title: "фонарик",
@@ -151,4 +151,17 @@ export const categories: Category[] = [
       },
     ],
   },
+];
+
+export const controlKey = (section: Section, key: string) => `${section.key}_${key}`;
+
+export const controlPath = (category: Category, section: Section, key: string) =>
+  `${category.folder}.${section.title}.${controlKey(section, key)}`;
+
+export const levaKeys = (category: Category) => [
+  ...Object.keys(category.actions ?? {}),
+  ...category.sections.flatMap((section) => [
+    section.title,
+    ...Object.keys(section.ranges).map((key) => controlKey(section, key)),
+  ]),
 ];

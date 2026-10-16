@@ -4,7 +4,7 @@ import { button, folder, LevaPanel, monitor, useControls, useCreateStore } from 
 import { useEffect, useState } from "react";
 import { clock, setClock, subscribeClock } from "@/lib/clock";
 import { defaults, resetTuning, runAction, tuning, tuningStyle } from "@/lib/tuning";
-import { type Category, categories, type Range, type Section } from "./categories";
+import { type Category, categories, controlKey, controlPath, type Range, type Section } from "./categories";
 import { COLORS, colorKey, paintColor, swatches, toHex } from "./colors";
 import styles from "./Menu.module.css";
 import { forget, restore, save } from "./storage";
@@ -64,7 +64,10 @@ const control = (section: Section, key: string, range: Range) => {
 
 const sliders = (section: Section): Schema =>
   Object.fromEntries(
-    Object.entries(section.ranges).map(([key, range]) => [key, control(section, key, range)]),
+    Object.entries(section.ranges).map(([key, range]) => [
+      controlKey(section, key),
+      control(section, key, range),
+    ]),
   );
 
 function Controls({ store, category }: { store: Store; category: Category }) {
@@ -129,9 +132,8 @@ const resetAll = (store: Store) => {
   for (const category of categories) {
     for (const section of category.sections) {
       const values = defaults[section.key] as Record<string, Value>;
-      for (const key of Object.keys(section.ranges)) {
-        paths[`${category.folder}.${section.title}.${key}`] = copy(values[key]);
-      }
+      for (const key of Object.keys(section.ranges))
+        paths[controlPath(category, section, key)] = copy(values[key]);
     }
   }
   store.set(paths, false);
