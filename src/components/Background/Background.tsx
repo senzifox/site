@@ -1,26 +1,26 @@
 "use client";
 
-import { motion, useScroll, useTransform } from "motion/react";
+import { motion, useMotionValue, useScroll, useTransform } from "motion/react";
 import { useEffect, useRef } from "react";
 import { pointer, subscribePointer } from "@/lib/pointer";
 import { lerp, lightProgress } from "@/lib/scroll";
-import { tuning } from "@/lib/tuning";
+import { registerAction, tuning } from "@/lib/tuning";
 import styles from "./Background.module.css";
 
-const GLOW = 0.5;
 const DOT_STEP = 28;
 
-const patternShift = (scrollY: number) => -((0.25 * scrollY) % DOT_STEP);
+const patternShift = (scrollY: number) => -((tuning.background.parallax * scrollY) % DOT_STEP);
 
 export function Background() {
   const { scrollY } = useScroll();
   const le = useTransform(scrollY, lightProgress);
   const spot = useRef<HTMLDivElement>(null);
+  const tuned = useMotionValue(0);
 
-  const light = useTransform(le, (v) => {
+  const light = useTransform([le, tuned], ([v]: number[]) => {
     const rx = lerp(85, 55, v);
     const ry = lerp(62, 20, v);
-    const alpha = lerp(0.34, 0.14, v) * GLOW;
+    const alpha = lerp(0.34, 0.14, v) * tuning.background.glow;
     return `radial-gradient(ellipse ${rx}% ${ry}% at 50% 0, rgb(var(--glow) / ${alpha}), rgb(var(--glow2) / ${alpha * 0.35}) 50%, transparent 100%)`;
   });
 
@@ -30,7 +30,9 @@ export function Background() {
     return `radial-gradient(ellipse ${rx}% ${ry}% at 50% 0, #000, rgb(0 0 0 / 0.45) 100%)`;
   });
 
-  const patternY = useTransform(scrollY, patternShift);
+  const patternY = useTransform([scrollY, tuned], ([y]: number[]) => patternShift(y));
+
+  useEffect(() => registerAction("background.repaint", () => tuned.set(tuned.get() + 1)), [tuned]);
 
   useEffect(
     () =>

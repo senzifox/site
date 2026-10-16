@@ -5,6 +5,7 @@ import { Icon } from "@/components/Icon/Icon";
 import type { IconName } from "@/components/Icon/icons";
 import { burstFrom } from "@/lib/burst";
 import { stripWhitespace } from "@/lib/format";
+import { registerAction } from "@/lib/tuning";
 
 const COPIED_MS = 1400;
 
@@ -34,8 +35,17 @@ type Props = {
 export function CopyButton({ value, className, copiedClassName, icon = "copy", size = 20, label }: Props) {
   const [copied, setCopied] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const self = useRef<HTMLButtonElement>(null);
 
   useEffect(() => () => clearTimeout(timer.current), []);
+
+  useEffect(
+    () =>
+      registerAction("copy.burst", () => {
+        if (self.current) burstFrom(self.current);
+      }),
+    [],
+  );
 
   const copy = async (event: MouseEvent<HTMLButtonElement>) => {
     const button = event.currentTarget;
@@ -52,6 +62,7 @@ export function CopyButton({ value, className, copiedClassName, icon = "copy", s
 
   return (
     <button
+      ref={self}
       type="button"
       className={copied ? `${className} ${copiedClassName}` : className}
       onClick={copy}

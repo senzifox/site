@@ -106,6 +106,7 @@ const categories: Category[] = [
   },
   {
     folder: "эффекты",
+    actions: { "вспышка копирования": "copy.burst" },
     sections: [
       {
         title: "фонарик",
@@ -125,6 +126,26 @@ const categories: Category[] = [
           ringStrength: { label: "яркость рамки", min: 0, max: 1, step: 0.01 },
           fill: { label: "радиус пятна", min: 0, max: 800, step: 5 },
           fillStrength: { label: "яркость пятна", min: 0, max: 0.5, step: 0.005 },
+        },
+      },
+      {
+        title: "вспышка копирования",
+        key: "copyBurst",
+        ranges: {
+          count: { label: "количество", min: 1, max: 60, step: 1 },
+          distance: { label: "дальность", min: 0, max: 200, step: 1 },
+          duration: { label: "длительность, мс", min: 100, max: 3000, step: 10 },
+          size: { label: "размер", min: 0.5, max: 12, step: 0.5 },
+          drop: { label: "падение", min: -60, max: 80, step: 1 },
+        },
+      },
+      {
+        title: "фон",
+        key: "background",
+        apply: "background.repaint",
+        ranges: {
+          glow: { label: "свечение", min: 0, max: 2, step: 0.01 },
+          parallax: { label: "параллакс точек", min: 0, max: 1, step: 0.01 },
         },
       },
     ],

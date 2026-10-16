@@ -1,16 +1,21 @@
-const COUNT = 14;
+import { tuning } from "@/lib/tuning";
+
 const TAU = Math.PI * 2;
+
+const within = ([min, max]: number[]) => min + Math.random() * (max - min);
 
 export const burstFrom = (element: Element) => {
   if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   const rect = element.getBoundingClientRect();
   const cx = rect.left + rect.width / 2;
   const cy = rect.top + rect.height / 2;
+  const look = tuning.copyBurst;
+  const count = Math.round(look.count);
 
-  for (let i = 0; i < COUNT; i++) {
-    const size = 2 + Math.random() * 3;
-    const angle = (i / COUNT) * TAU + Math.random() * 0.5;
-    const distance = 22 + Math.random() * 34;
+  for (let i = 0; i < count; i++) {
+    const size = within(look.size);
+    const angle = (i / count) * TAU + Math.random() * 0.5;
+    const distance = within(look.distance);
     const dx = Math.cos(angle) * distance;
     const dy = Math.sin(angle) * distance;
     const spark = document.createElement("span");
@@ -22,9 +27,9 @@ export const burstFrom = (element: Element) => {
         [
           { transform: "translate(0, 0) scale(1)", opacity: 1 },
           { transform: `translate(${dx * 0.8}px, ${dy * 0.8}px) scale(1)`, opacity: 1, offset: 0.45 },
-          { transform: `translate(${dx}px, ${dy + 14}px) scale(0.3)`, opacity: 0 },
+          { transform: `translate(${dx}px, ${dy + look.drop}px) scale(0.3)`, opacity: 0 },
         ],
-        { duration: 550 + Math.random() * 350, easing: "cubic-bezier(0.2, 0.7, 0.3, 1)" },
+        { duration: within(look.duration), easing: "cubic-bezier(0.2, 0.7, 0.3, 1)" },
       )
       .finished.then(remove, remove);
   }
