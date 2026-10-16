@@ -46,7 +46,7 @@ export const site: Site = {
     {
       type: "text",
       title:
-        "вот он ВЕЛИКий сайт на который зайдёт три человека, зато гештальт закрыл, а так... потихонечку живу, чёта пытаюсь в айти, по планам не сдохнуть, а так, в целом, всё ок, спасибо что зашёл, я тебя люблю. пЫсЫ. полистай ещё, там есть всякие прикольные штуки, типа того что я слушаю на спотифай и во что играю в стиме прям ща :3",
+        "в будущем тут чёта та будет :3",
       text: "",
     },
     {
@@ -87,7 +87,7 @@ export const site: Site = {
     //  { type: "link", icon: "github", label: "github", value: "senzifox/заглушка", href: "https://github.com/senzifox" },
   ],
   footer: {
-    text: "senzifox ©",
-    link: { label: "точно, стопроцентов, клянусь не вайбкод", href: profile.links.repo },
+    text: "me ©",
+    link: { label: "исходники", href: profile.links.repo },
   },
 };
