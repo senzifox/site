@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { timeScale } from "@/lib/clock";
 import { pointer, subscribePointer } from "@/lib/pointer";
 import { clamp01, smoothstep } from "@/lib/scroll";
 import { registerAction, tuning } from "@/lib/tuning";
@@ -163,7 +164,7 @@ export function Sparks({ face, burst }: Props) {
     };
 
     const tick = (now: number) => {
-      const dt = last ? Math.min(MAX_STEP, (now - last) / 1000) : 0;
+      const dt = last ? Math.min(MAX_STEP, (now - last) / 1000) * timeScale() : 0;
       last = now;
       time += dt;
       step(dt);

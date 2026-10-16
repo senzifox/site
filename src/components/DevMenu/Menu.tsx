@@ -2,6 +2,7 @@
 
 import { button, folder, LevaPanel, useControls, useCreateStore } from "leva";
 import { useEffect, useState } from "react";
+import { clock, setClock, subscribeClock, timeScale } from "@/lib/clock";
 import {
   applyTuning,
   defaults,
@@ -347,10 +348,50 @@ function Colors({ store }: { store: Store }) {
   return null;
 }
 
+let syncFrame = 0;
+
+const syncAnimations = () => {
+  const rate = timeScale();
+  for (const animation of document.getAnimations()) {
+    const target = animation.effect instanceof KeyframeEffect ? animation.effect.target : null;
+    if (target?.closest("[data-dev-menu]")) continue;
+    if (animation.playbackRate !== rate) animation.playbackRate = rate;
+  }
+  cancelAnimationFrame(syncFrame);
+  syncFrame = rate === 1 ? 0 : requestAnimationFrame(syncAnimations);
+};
+
+subscribeClock(syncAnimations);
+
+const TOOLS = "время";
+
+function Tools({ store }: { store: Store }) {
+  useControls(
+    TOOLS,
+    {
+      speed: {
+        label: "скорость",
+        value: clock.scale,
+        min: 0,
+        max: 2,
+        step: 0.05,
+        onChange: (scale: number) => setClock({ scale }),
+      },
+      paused: { label: "пауза", value: clock.paused, onChange: (paused: boolean) => setClock({ paused }) },
+    },
+    { store },
+  );
+  return null;
+}
+
 const resetAll = (store: Store) => {
   resetTuning();
   forget();
-  const paths: Record<string, Value | string> = {};
+  setClock({ scale: 1, paused: false });
+  const paths: Record<string, Value | string | boolean> = {
+    [`${TOOLS}.speed`]: 1,
+    [`${TOOLS}.paused`]: false,
+  };
   for (const swatch of swatches) {
     document.documentElement.style.removeProperty(swatch.name);
     paths[`${COLORS}.${colorKey(swatch)}`] = toHex(swatch);
@@ -388,13 +429,14 @@ export function Menu() {
 
   return (
     <>
+      <Tools store={store} />
       {categories.map((category) => (
         <Controls key={category.folder} store={store} category={category} />
       ))}
       <Colors store={store} />
       <MenuActions store={store} />
       {open && (
-        <div className={styles.panel}>
+        <div className={styles.panel} data-dev-menu="">
           <LevaPanel
             store={store}
             fill
@@ -406,6 +448,7 @@ export function Menu() {
       <button
         type="button"
         className={styles.toggle}
+        data-dev-menu=""
         aria-label={open ? "close dev menu" : "open dev menu"}
         aria-expanded={open}
         onClick={() => setOpen((current) => !current)}

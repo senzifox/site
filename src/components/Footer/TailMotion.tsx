@@ -1,6 +1,7 @@
 "use client";
 
 import { type ReactNode, useEffect, useRef } from "react";
+import { subscribeClock, timeScale } from "@/lib/clock";
 import { registerAction, tuning } from "@/lib/tuning";
 
 export function TailMotion({ className, children }: { className?: string; children: ReactNode }) {
@@ -14,6 +15,8 @@ export function TailMotion({ className, children }: { className?: string; childr
       if (query.matches) {
         svg.pauseAnimations();
         svg.setCurrentTime(0);
+      } else if (timeScale() === 0) {
+        svg.pauseAnimations();
       } else {
         svg.unpauseAnimations();
       }
@@ -24,9 +27,11 @@ export function TailMotion({ className, children }: { className?: string; childr
       for (const animate of svg.querySelectorAll("animate"))
         animate.setAttribute("dur", `${tuning.tail.seconds}s`);
     });
+    const unsubscribe = subscribeClock(sync);
     return () => {
       query.removeEventListener("change", sync);
       release();
+      unsubscribe();
     };
   }, []);
 

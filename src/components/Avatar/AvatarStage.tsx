@@ -1,6 +1,7 @@
 "use client";
 
 import { type KeyboardEvent, useEffect, useRef, useState } from "react";
+import { timeScale } from "@/lib/clock";
 import { registerAction, tuning } from "@/lib/tuning";
 import styles from "./Avatar.module.css";
 import { Sparks } from "./Sparks";
@@ -128,10 +129,13 @@ export function AvatarStage({ alt, size }: { alt: string; size: number }) {
     }
     let index = 0;
     let from = angle.current;
-    let start = performance.now();
+    let elapsed = 0;
+    let last = performance.now();
     const frame = (now: number) => {
+      elapsed += (now - last) * timeScale();
+      last = now;
       const segment = segments[index];
-      const t = segment.ms > 0 ? Math.min(1, (now - start) / segment.ms) : 1;
+      const t = segment.ms > 0 ? Math.min(1, elapsed / segment.ms) : 1;
       render(from + (segment.to - from) * segment.ease(t));
       if (t < 1) {
         animation.current = requestAnimationFrame(frame);
@@ -143,7 +147,7 @@ export function AvatarStage({ alt, size }: { alt: string; size: number }) {
         return;
       }
       from = segment.to;
-      start = now;
+      elapsed = 0;
       animation.current = requestAnimationFrame(frame);
     };
     animation.current = requestAnimationFrame(frame);
