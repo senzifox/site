@@ -41,6 +41,21 @@ export const formatAgo = (date: Date | string, now = new Date()) => {
   );
 };
 
+export const formatDateTime = (timeZone: string, date: Date) => {
+  try {
+    return new Intl.DateTimeFormat("ru-RU", {
+      timeZone,
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(date);
+  } catch {
+    return date.toISOString();
+  }
+};
+
 export const formatClock = (timeZone: string, date = new Date()) => {
   try {
     return new Intl.DateTimeFormat("ru-RU", { timeZone, hour: "2-digit", minute: "2-digit" }).format(date);

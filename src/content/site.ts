@@ -45,8 +45,7 @@ export const site: Site = {
   blocks: [
     {
       type: "text",
-      title:
-        "в будущем тут чёта та будет :3",
+      title: "в будущем тут чёта та будет :3",
       text: "",
     },
     {
@@ -87,7 +86,8 @@ export const site: Site = {
     //  { type: "link", icon: "github", label: "github", value: "senzifox/заглушка", href: "https://github.com/senzifox" },
   ],
   footer: {
-    text: "me ©",
+    text: "сензифокс ©",
     link: { label: "исходники", href: profile.links.repo },
+    build: "сборка",
   },
 };

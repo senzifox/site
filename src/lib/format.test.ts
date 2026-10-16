@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatAgo, formatTime, formatUptime, stripWhitespace } from "./format";
+import { formatAgo, formatDateTime, formatTime, formatUptime, stripWhitespace } from "./format";
 
 describe("formatTime", () => {
   it("formats minutes and padded seconds", () => {
@@ -36,5 +36,15 @@ describe("formatAgo", () => {
     expect(formatAgo("2026-10-05T11:55:00Z", now)).toBe("5 минут назад");
     expect(formatAgo("2026-10-05T09:00:00Z", now)).toBe("3 часа назад");
     expect(formatAgo("2026-10-04T12:00:00Z", now)).toBe("вчера");
+  });
+});
+
+describe("formatDateTime", () => {
+  it("formats the date and time in the given zone", () => {
+    expect(formatDateTime("Europe/Moscow", new Date("2026-10-16T17:15:00Z"))).toBe("16.10.2026, 20:15");
+  });
+
+  it("falls back to ISO for an unknown zone", () => {
+    expect(formatDateTime("Mars/Olympus", new Date("2026-10-16T17:15:00Z"))).toBe("2026-10-16T17:15:00.000Z");
   });
 });

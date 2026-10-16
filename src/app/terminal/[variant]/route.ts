@@ -1,5 +1,6 @@
 import { type TerminalVariant, terminal } from "@/content/terminal";
 import type { TerminalRow } from "@/content/types";
+import { build } from "@/lib/build";
 import { getGithubPush } from "@/lib/github/github";
 import { getSpotifyNow } from "@/lib/spotify/spotify";
 import { spotifyIdle } from "@/lib/spotify/types";
@@ -53,7 +54,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ var
     steam,
     github,
     uptime: process.uptime(),
-    deploy: { sha: process.env.BUILD_SHA ?? "dev", time: process.env.BUILD_TIME ?? new Date().toISOString() },
+    deploy: build,
     now: new Date(),
   });
   return new Response(body, { headers });
