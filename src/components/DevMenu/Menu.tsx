@@ -68,6 +68,34 @@ const categories: Category[] = [
       },
     ],
   },
+  {
+    folder: "аватарка",
+    actions: { перевернуть: "avatar.flip", покачать: "avatar.peek", "сбросить «уже листал»": "avatar.unsee" },
+    sections: [
+      {
+        title: "переворот",
+        key: "flip",
+        ranges: {
+          ms: { label: "длительность, мс", min: 0, max: 2000, step: 10 },
+          sharpness: { label: "резкость торможения", min: 1, max: 10, step: 0.5 },
+        },
+      },
+      {
+        title: "подсказка",
+        key: "peek",
+        ranges: {
+          delay: { label: "первая через, мс", min: 0, max: 15000, step: 100 },
+          every: { label: "повтор через, мс", min: 1000, max: 60000, step: 500 },
+          limit: { label: "сколько раз", min: 0, max: 10, step: 1 },
+          back: { label: "угол назад", min: 0, max: 90, step: 1 },
+          backMs: { label: "назад, мс", min: 0, max: 1500, step: 10 },
+          forth: { label: "угол вперёд", min: 0, max: 90, step: 1 },
+          forthMs: { label: "вперёд, мс", min: 0, max: 1500, step: 10 },
+          settleMs: { label: "возврат, мс", min: 0, max: 1500, step: 10 },
+        },
+      },
+    ],
+  },
 ];
 
 type Value = number | number[];

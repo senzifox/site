@@ -1,29 +1,29 @@
 "use client";
 
 import { type KeyboardEvent, useEffect, useRef, useState } from "react";
+import { registerAction, tuning } from "@/lib/tuning";
 import styles from "./Avatar.module.css";
 import { Sparks } from "./Sparks";
 import { avatars } from "./silhouette";
 
 const OUTLINE_WIDTH = 2;
-const FLIP_MS = 650;
 const ARM_DELAY = 2500;
-const PEEK_DELAY = 3000;
-const PEEK_EVERY = 12000;
-const PEEK_LIMIT = 3;
 const SEEN_KEY = "avatar:flipped";
 
 type Segment = { to: number; ms: number; ease: (t: number) => number };
 
-const easeOut = (t: number) => 1 - (1 - t) ** 5;
+const easeOut = (t: number) => 1 - (1 - t) ** tuning.flip.sharpness;
 
 const easeInOut = (t: number) => (1 - Math.cos(Math.PI * t)) / 2;
 
-const peekFrom = (base: number): Segment[] => [
-  { to: base - 34, ms: 420, ease: easeInOut },
-  { to: base + 12, ms: 380, ease: easeInOut },
-  { to: base, ms: 460, ease: easeInOut },
-];
+const peekFrom = (base: number): Segment[] => {
+  const { back, backMs, forth, forthMs, settleMs } = tuning.peek;
+  return [
+    { to: base - back, ms: backMs, ease: easeInOut },
+    { to: base + forth, ms: forthMs, ease: easeInOut },
+    { to: base, ms: settleMs, ease: easeInOut },
+  ];
+};
 
 const wrap = (index: number) => ((index % avatars.length) + avatars.length) % avatars.length;
 
@@ -42,6 +42,14 @@ const seen = () => {
 const rememberSeen = () => {
   try {
     localStorage.setItem(SEEN_KEY, "1");
+  } catch {
+    return;
+  }
+};
+
+const forgetSeen = () => {
+  try {
+    localStorage.removeItem(SEEN_KEY);
   } catch {
     return;
   }
@@ -86,6 +94,7 @@ export function AvatarStage({ alt, size }: { alt: string; size: number }) {
   const [face, setFace] = useState(0);
   const [burst, setBurst] = useState(0);
   const [armed, setArmed] = useState(false);
+  const [hinting, setHinting] = useState(0);
 
   const setSides = (next: [number, number]) => {
     sidesRef.current = next;
@@ -122,7 +131,7 @@ export function AvatarStage({ alt, size }: { alt: string; size: number }) {
     let start = performance.now();
     const frame = (now: number) => {
       const segment = segments[index];
-      const t = Math.min(1, (now - start) / segment.ms);
+      const t = segment.ms > 0 ? Math.min(1, (now - start) / segment.ms) : 1;
       render(from + (segment.to - from) * segment.ease(t));
       if (t < 1) {
         animation.current = requestAnimationFrame(frame);
@@ -158,7 +167,7 @@ export function AvatarStage({ alt, size }: { alt: string; size: number }) {
     markFlipped();
     const base = target.current;
     prepare(base, direction);
-    play([{ to: base - 180 * direction, ms: FLIP_MS, ease: easeOut }]);
+    play([{ to: base - 180 * direction, ms: tuning.flip.ms, ease: easeOut }]);
   };
 
   useEffect(() => {
@@ -167,30 +176,45 @@ export function AvatarStage({ alt, size }: { alt: string; size: number }) {
     return () => clearTimeout(timer);
   }, [flippable]);
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: play only touches refs and stable setters
+  // biome-ignore lint/correctness/useExhaustiveDependencies: play reads refs, hinting restarts the hint
   useEffect(() => {
     if (!flippable || seen() || reducedMotion()) return;
     let count = 0;
     const peek = () => {
-      if (flipped.current || count >= PEEK_LIMIT) return;
+      if (flipped.current || count >= tuning.peek.limit) return;
       const resting = !animation.current && angle.current % 180 === 0;
       if (resting && !document.hidden) {
         count += 1;
         play(peekFrom(angle.current));
       }
-      timer = setTimeout(peek, PEEK_EVERY);
+      timer = setTimeout(peek, tuning.peek.every);
     };
-    let timer = setTimeout(peek, PEEK_DELAY);
-    return () => {
-      clearTimeout(timer);
-      cancelAnimationFrame(animation.current);
-    };
-  }, [flippable]);
+    let timer = setTimeout(peek, hinting ? 0 : tuning.peek.delay);
+    return () => clearTimeout(timer);
+  }, [flippable, hinting]);
 
   const onClick = () => {
     if (flippable) flip(1);
     setBurst((count) => count + 1);
   };
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: handlers only touch refs and stable setters
+  useEffect(() => {
+    if (!flippable) return;
+    const releases = [
+      registerAction("avatar.flip", onClick),
+      registerAction("avatar.peek", () => play(peekFrom(target.current))),
+      registerAction("avatar.unsee", () => {
+        forgetSeen();
+        flipped.current = false;
+        setHinting((count) => count + 1);
+      }),
+    ];
+    return () => {
+      stop();
+      for (const release of releases) release();
+    };
+  }, [flippable]);
 
   const onKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
     if (!flippable || (event.key !== "ArrowLeft" && event.key !== "ArrowRight")) return;

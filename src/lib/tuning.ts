@@ -16,6 +16,17 @@ export const defaults = {
     heatDecay: 3,
   },
   sparkLayout: { count: 22, trackSamples: 480, smoothing: 8, cropTouch: 2, cropHide: 100, cropFade: 180 },
+  flip: { ms: 650, sharpness: 5 },
+  peek: {
+    delay: 3000,
+    every: 12000,
+    limit: 3,
+    back: 34,
+    backMs: 420,
+    forth: 12,
+    forthMs: 380,
+    settleMs: 460,
+  },
 };
 
 export type Tuning = typeof defaults;
