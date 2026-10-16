@@ -119,7 +119,7 @@ function Tools({ store }: { store: Store }) {
         onChange: (scale: number) => setClock({ scale }),
       },
       paused: { label: "пауза", value: clock.paused, onChange: (paused: boolean) => setClock({ paused }) },
-      fps: monitor(() => Math.round(fps.value), { interval: FPS_INTERVAL }),
+      fps: monitor(() => String(Math.round(fps.value)), { interval: FPS_INTERVAL }),
       график: monitor(() => fps.value, { graph: true, interval: FPS_INTERVAL }),
     },
     { store },
