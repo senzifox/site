@@ -47,7 +47,7 @@ export function Background() {
         element.style.width = `${size}px`;
         element.style.height = `${size}px`;
         element.style.transform = `translate(${left}px, ${top}px)`;
-        element.style.backgroundPosition = `${-left}px ${patternShift(window.scrollY) - top}px`;
+        element.style.setProperty("--spot-shift", `${-left}px ${patternShift(window.scrollY) - top}px`);
       }),
     [],
   );

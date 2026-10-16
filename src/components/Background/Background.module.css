@@ -27,20 +27,32 @@
   opacity: 0;
   transition: opacity 400ms ease;
   will-change: transform;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28'%3E%3Ccircle cx='14' cy='14' r='1.4' fill='rgba(242,163,107,.8)'/%3E%3C/svg%3E");
-  background-size: 28px 28px;
-  mask-image: radial-gradient(
+  --spot-dots: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28'%3E%3Ccircle cx='14' cy='14' r='1.4' fill='rgba(0,0,0,.8)'/%3E%3C/svg%3E");
+  --spot-fade: radial-gradient(
     circle closest-side,
     #000,
     rgb(0 0 0 / var(--spot-falloff)) var(--spot-falloff-at),
     transparent
   );
-  -webkit-mask-image: radial-gradient(
-    circle closest-side,
-    #000,
-    rgb(0 0 0 / var(--spot-falloff)) var(--spot-falloff-at),
-    transparent
-  );
+  background-color: var(--accent);
+  mask-image: var(--spot-dots), var(--spot-fade);
+  mask-size:
+    28px 28px,
+    100% 100%;
+  mask-repeat: repeat, no-repeat;
+  mask-position:
+    var(--spot-shift, 0 0),
+    0 0;
+  mask-composite: intersect;
+  -webkit-mask-image: var(--spot-dots), var(--spot-fade);
+  -webkit-mask-size:
+    28px 28px,
+    100% 100%;
+  -webkit-mask-repeat: repeat, no-repeat;
+  -webkit-mask-position:
+    var(--spot-shift, 0 0),
+    0 0;
+  -webkit-mask-composite: source-in;
 }
 
 .on {
