@@ -211,8 +211,36 @@ function Changes({ store }: { store: Store }) {
   return null;
 }
 
+const WRITE_URL = "/api/dev/tuning";
+const STATUS_INTERVAL = 250;
+
+const writeStatus = { text: "—" };
+
+const writeToCode = async () => {
+  writeStatus.text = "пишу…";
+  try {
+    const response = await fetch(WRITE_URL, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(tuning),
+    });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const { written } = (await response.json()) as { written: boolean };
+    writeStatus.text = written ? "записано в tuningDefaults.ts" : "в коде уже так";
+  } catch (error) {
+    writeStatus.text = `не вышло: ${error instanceof Error ? error.message : String(error)}`;
+  }
+};
+
 function MenuActions({ store }: { store: Store }) {
-  useControls({ "сбросить всё": button(() => resetAll(store)) }, { store });
+  useControls(
+    {
+      "записать в код": button(writeToCode),
+      запись: monitor(() => writeStatus.text, { interval: STATUS_INTERVAL }),
+      "сбросить всё": button(() => resetAll(store)),
+    },
+    { store },
+  );
   return null;
 }
 

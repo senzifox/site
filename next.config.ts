@@ -1,5 +1,6 @@
 import { execSync } from "node:child_process";
 import type { NextConfig } from "next";
+import { PHASE_DEVELOPMENT_SERVER } from "next/constants";
 
 const gitSha = () => {
   try {
@@ -11,7 +12,9 @@ const gitSha = () => {
   }
 };
 
-const config: NextConfig = {
+const pageExtensions = ["tsx", "ts"];
+
+const config = (phase: string): NextConfig => ({
   output: "standalone",
   poweredByHeader: false,
   reactStrictMode: true,
@@ -19,6 +22,7 @@ const config: NextConfig = {
     BUILD_SHA: process.env.GIT_SHA || gitSha(),
     BUILD_TIME: new Date().toISOString(),
   },
-};
+  pageExtensions: phase === PHASE_DEVELOPMENT_SERVER ? ["dev.ts", ...pageExtensions] : pageExtensions,
+});
 
 export default config;
