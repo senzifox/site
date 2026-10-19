@@ -58,7 +58,7 @@ export type Site = {
   footer?: FooterContent;
 };
 
-export type FooterContent = { text: string; link?: { label: string; href: string }; build?: string };
+export type FooterContent = { text: string; links?: { label: string; href: string }[]; build?: string };
 
 export type TerminalRow =
   | { type: "title"; user: string; host: string; subtitle?: string }

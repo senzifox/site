@@ -79,4 +79,4 @@ a push to main runs checks, builds the image on github runners, pushes it to ghc
 
 ## license
 
-the code is under the [mit license](LICENSE), the content is not: information in `src/content`, photos and images in `assets` and `public`, and the generated avatar, silhouette, favicons and ascii arts are © senzifox, all rights reserved.
+the code is under the [mit license](LICENSE), the content is not: information in `src/content`, photos and images in `assets` and `public` (except the background art, is linked from the footer), and the generated avatar, silhouette, favicons and ascii arts are © senzifox, all rights reserved.

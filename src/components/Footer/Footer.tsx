@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import { profile } from "@/content/profile";
 import type { FooterContent } from "@/content/types";
 import { commitUrl, build as current } from "@/lib/build";
@@ -23,7 +24,7 @@ function BuildLine({ label }: { label: string }) {
   );
 }
 
-export function Footer({ text, link, build }: FooterContent) {
+export function Footer({ text, links, build }: FooterContent) {
   return (
     <footer className={styles.footer}>
       <div className={styles.divider} aria-hidden="true">
@@ -33,14 +34,14 @@ export function Footer({ text, link, build }: FooterContent) {
       </div>
       <span className={styles.text}>
         {text}
-        {link && (
-          <>
-            {" "}
-            <a className={styles.link} href={link.href} target="_blank" rel="noopener noreferrer">
-              {link.label}
+        {links?.map(({ label, href }, index) => (
+          <Fragment key={href}>
+            {index === 0 ? " " : " · "}
+            <a className={styles.link} href={href} target="_blank" rel="noopener noreferrer">
+              {label}
             </a>
-          </>
-        )}
+          </Fragment>
+        ))}
       </span>
       {build && <BuildLine label={build} />}
     </footer>

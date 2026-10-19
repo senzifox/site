@@ -87,7 +87,10 @@ export const site: Site = {
   ],
   footer: {
     text: "сензифокс ©",
-    link: { label: "исходники", href: profile.links.repo },
+    links: [
+      { label: "исходники", href: profile.links.repo },
+      { label: "фон", href: "https://pin.it/1IUBoonZC" },
+    ],
     build: "сборка",
   },
 };
