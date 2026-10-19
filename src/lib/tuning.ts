@@ -10,6 +10,7 @@ export const tuningStyle = ({
   flashlight,
   cardGlow,
   header,
+  background,
 }: Tuning = tuning): Record<`--${string}`, string> => ({
   "--spot-strength": `${flashlight.strength}`,
   "--spot-falloff": `${flashlight.falloff}`,
@@ -19,6 +20,9 @@ export const tuningStyle = ({
   "--card-fill-size": `${cardGlow.fill}px`,
   "--card-fill-strength": `${cardGlow.fillStrength}`,
   "--rotate-fade": `${header.fadeMs}ms`,
+  "--bg-image": `${background.image}`,
+  "--bg-image-blur": `${background.blur}px`,
+  "--bg-image-x": `${background.focusX}%`,
 });
 
 type Bag = Record<string, unknown>;

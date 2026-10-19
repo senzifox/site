@@ -54,6 +54,7 @@ export function Background() {
 
   return (
     <div aria-hidden="true">
+      <div className={`${styles.layer} ${styles.image}`} />
       <motion.div className={styles.layer} style={{ background: light }} />
       <motion.div
         className={`${styles.layer} ${styles.patternFrame}`}

@@ -22,7 +22,7 @@ docker, github actions, ghcr, nginx
 
 ```
 deploy/           dockerfile, compose, deploy script and nginx config
-scripts/          generators for the avatar, icons, footer tail and ascii fox
+scripts/          generators for the avatar, background, icons, footer tail and ascii fox
 src/app/api/      spotify, steam and health endpoints, dev-only tuning and presets routes
 src/app/terminal/ plain-text pages for curl, wget and friends
 src/components/   ui and content blocks, the dev menu
@@ -54,6 +54,7 @@ pnpm dev
 | --- | --- |
 | `pnpm check` | lint, typecheck and tests |
 | `pnpm avatar` | builds the avatar, its silhouette, the cutout and favicons from `assets/avatar` |
+| `pnpm background` | compresses the background from `assets/background` into avif and webp |
 | `pnpm icons` | regenerates the icon subset from iconify |
 | `pnpm tail` | regenerates the footer tail animation |
 | `pnpm fox` | regenerates the ascii fox for the terminal version |

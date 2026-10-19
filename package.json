@@ -16,6 +16,7 @@
     "test": "vitest run",
     "check": "pnpm lint && pnpm typecheck && pnpm test",
     "avatar": "node scripts/avatar.ts",
+    "background": "node scripts/background.ts",
     "tail": "node scripts/tail.ts",
     "icons": "node scripts/icons.ts",
     "fox": "node scripts/fox.ts",

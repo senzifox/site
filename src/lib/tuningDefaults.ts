@@ -30,7 +30,7 @@ export const defaults = {
   flashlight: { size: 320, strength: 1, falloff: 0.35, falloffAt: 55 },
   cardGlow: { ring: 200, ringStrength: 0.75, fill: 260, fillStrength: 0.1 },
   copyBurst: { count: 14, distance: [22, 56], duration: [550, 900], size: [2, 5], drop: 14 },
-  background: { glow: 0.5, parallax: 0.25 },
+  background: { glow: 0.5, parallax: 0.25, image: 0.3, blur: 0, focusX: 30 },
   header: { showMs: 3600, fadeMs: 600 },
   tail: { seconds: 3.2 },
 };

@@ -126,6 +126,9 @@ export const categories: Category[] = [
         ranges: {
           glow: { label: "свечение", min: 0, max: 2, step: 0.01 },
           parallax: { label: "параллакс точек", min: 0, max: 1, step: 0.01 },
+          image: { label: "картинка", min: 0, max: 1, step: 0.01 },
+          blur: { label: "размытие", min: 0, max: 40, step: 0.5 },
+          focusX: { label: "фокус по X", min: 0, max: 100, step: 1 },
         },
       },
     ],

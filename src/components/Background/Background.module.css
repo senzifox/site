@@ -5,6 +5,15 @@
   pointer-events: none;
 }
 
+.image {
+  background:
+    image-set(url("/background.avif") type("image/avif"), url("/background.webp") type("image/webp"))
+    var(--bg-image-x) 70% / cover no-repeat;
+  opacity: var(--bg-image);
+  filter: blur(var(--bg-image-blur));
+  transform: scale(1.06);
+}
+
 .patternFrame {
   overflow: hidden;
 }
