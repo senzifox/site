@@ -1,4 +1,4 @@
-export const HEADER_RANGE = 300;
+export const HEADER_RANGE = 280;
 export const EXPANDED_HEIGHT = 436;
 export const LIGHT_RANGE = 600;
 
@@ -12,7 +12,7 @@ export const headerProgress = (scrollY: number) => clamp01(scrollY / HEADER_RANG
 
 export const lightProgress = (scrollY: number) => 1 - (1 - clamp01(scrollY / LIGHT_RANGE)) ** 2;
 
-export const backdropProgress = (p: number) => clamp01((p - 0.85) / 0.15);
+export const surfaceProgress = (p: number) => smoothstep(clamp01((p - 0.6) / 0.4));
 
 export const fadeOut = (p: number, speed: number) => Math.max(0, 1 - p * speed);
 

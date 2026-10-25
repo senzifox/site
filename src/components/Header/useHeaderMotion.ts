@@ -2,16 +2,17 @@
 
 import { type MotionValue, useScroll, useTransform } from "motion/react";
 import {
-  backdropProgress,
   EXPANDED_HEIGHT,
   fadeOut,
   HEADER_RANGE,
   headerProgress,
   lerp,
   smoothstep,
+  surfaceProgress,
 } from "@/lib/scroll";
 
-const COLLAPSED_X = 152;
+const COLLAPSED_X = 164;
+const SURFACE_TOP = 12;
 
 type Slide = { x: number; from: number; to: number; scale?: number };
 
@@ -27,18 +28,21 @@ export function useHeaderMotion(avatarSize: number) {
   const { scrollY } = useScroll();
   const p = useTransform(scrollY, headerProgress);
   const e = useTransform(p, smoothstep);
-  const k = useTransform(p, backdropProgress);
+  const s = useTransform(p, surfaceProgress);
 
   return {
     height: useTransform(p, (v) => EXPANDED_HEIGHT - HEADER_RANGE * v),
-    background: useTransform(k, (v) => `rgb(var(--head) / ${0.7 * v})`),
-    backdropFilter: useTransform(k, (v) => (v > 0 ? `blur(${18 * v}px)` : "none")),
-    borderColor: useTransform(k, (v) => `rgb(255 255 255 / ${0.08 * v})`),
+    surface: {
+      top: useTransform(s, (v) => SURFACE_TOP * v),
+      inset: useTransform(s, (v) => `calc(var(--gutter) * ${v})`),
+      radius: useTransform(s, (v) => `calc(var(--radius-card) * ${v})`),
+      opacity: s,
+    },
     glowOpacity: useTransform(p, (v) => fadeOut(v, 1.6)),
-    avatar: useSlide(e, { x: 16, from: 40, to: 8, scale: 120 / avatarSize }),
-    lineAbove: useSlide(e, { x: COLLAPSED_X, from: 280, to: 40 }),
-    name: useSlide(e, { x: COLLAPSED_X, from: 302, to: 62, scale: 28 / 34 }),
-    lineBelow: useSlide(e, { x: COLLAPSED_X, from: 346, to: 104 }),
+    avatar: useSlide(e, { x: 28, from: 40, to: 24, scale: 120 / avatarSize }),
+    lineAbove: useSlide(e, { x: COLLAPSED_X, from: 280, to: 56 }),
+    name: useSlide(e, { x: COLLAPSED_X, from: 302, to: 78, scale: 28 / 34 }),
+    lineBelow: useSlide(e, { x: COLLAPSED_X, from: 346, to: 120 }),
     lineBelowOpacity: useTransform(p, (v) => fadeOut(v, 2.2)),
     socialsOpacity: useTransform(p, (v) => fadeOut(v, 3)),
     socialsY: useTransform(p, (v) => -60 * v),

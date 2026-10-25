@@ -20,16 +20,17 @@ export function Header({ avatar, avatarSize, name, lineAbove, lineBelow, socials
   const lineAboveItems = (lineAbove ?? []).filter(Boolean);
 
   return (
-    <motion.header
-      className={styles.header}
-      style={{
-        height: m.height,
-        background: m.background,
-        backdropFilter: m.backdropFilter,
-        WebkitBackdropFilter: m.backdropFilter,
-        borderBottomColor: m.borderColor,
-      }}
-    >
+    <motion.header className={styles.header} style={{ height: m.height }}>
+      <motion.div
+        className={styles.surface}
+        style={{
+          top: m.surface.top,
+          left: m.surface.inset,
+          right: m.surface.inset,
+          borderRadius: m.surface.radius,
+          opacity: m.surface.opacity,
+        }}
+      />
       <motion.div className={styles.glow} style={{ opacity: m.glowOpacity }} />
       <motion.div className={styles.track} style={{ transform: m.avatar.track }}>
         <motion.div className={`${styles.item} ${styles.avatar}`} style={{ transform: m.avatar.item }}>

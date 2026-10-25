@@ -5,9 +5,19 @@
   translate: -50% 0;
   width: min(100%, var(--container));
   height: var(--header-expanded);
-  border-bottom: 1px solid transparent;
   z-index: 10;
   pointer-events: none;
+}
+
+.surface {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background: linear-gradient(rgb(255 255 255 / 0.04), rgb(255 255 255 / 0.04)), rgb(var(--head) / 0.45);
+  border: 1px solid rgb(255 255 255 / 0.08);
+  border-top-color: rgb(255 255 255 / 0.16);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
 }
 
 .glow {

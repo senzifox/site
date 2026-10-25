@@ -1,13 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  backdropProgress,
-  clamp01,
-  fadeOut,
-  headerProgress,
-  lerp,
-  lightProgress,
-  smoothstep,
-} from "./scroll";
+import { clamp01, fadeOut, headerProgress, lerp, lightProgress, smoothstep, surfaceProgress } from "./scroll";
 
 describe("scroll math", () => {
   it("clamps to the unit interval", () => {
@@ -29,9 +21,9 @@ describe("scroll math", () => {
     expect(smoothstep(0.25)).toBeLessThan(0.25);
   });
 
-  it("maps header scroll over 300px", () => {
+  it("maps header scroll over 280px", () => {
     expect(headerProgress(0)).toBe(0);
-    expect(headerProgress(150)).toBe(0.5);
+    expect(headerProgress(140)).toBe(0.5);
     expect(headerProgress(900)).toBe(1);
   });
 
@@ -41,10 +33,10 @@ describe("scroll math", () => {
     expect(lightProgress(1200)).toBe(1);
   });
 
-  it("shows header backdrop only at the end of the collapse", () => {
-    expect(backdropProgress(0.85)).toBe(0);
-    expect(backdropProgress(0.925)).toBeCloseTo(0.5);
-    expect(backdropProgress(1)).toBe(1);
+  it("morphs header into a card over the last part of the collapse", () => {
+    expect(surfaceProgress(0.6)).toBe(0);
+    expect(surfaceProgress(0.8)).toBeCloseTo(0.5);
+    expect(surfaceProgress(1)).toBe(1);
   });
 
   it("fades out at the given speed", () => {
