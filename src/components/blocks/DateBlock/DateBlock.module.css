@@ -84,3 +84,57 @@
   line-height: 18px;
   color: var(--text-muted);
 }
+
+.big {
+  display: flex;
+  align-items: stretch;
+  gap: 14px;
+}
+
+.days {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 56px;
+  line-height: 56px;
+  font-weight: 700;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 0 24px rgb(var(--glow) / 0.7);
+}
+
+.rest {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 4px 0 2px;
+}
+
+.daysUnit {
+  font-size: 16px;
+  line-height: 20px;
+  font-weight: 500;
+  color: var(--text-strong);
+}
+
+.hms {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 20px;
+  line-height: 24px;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.colon {
+  animation: blink 1s steps(1) infinite;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0.2;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .colon {
+    animation: none;
+  }
+}

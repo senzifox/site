@@ -1,5 +1,7 @@
 export type DateMode = "countdown" | "since" | "date";
 
+export type DateLook = "tiles" | "big";
+
 type Moment = { year?: number; month: number; day: number; hour: number; minute: number };
 
 export type DateState = {

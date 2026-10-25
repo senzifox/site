@@ -22,6 +22,8 @@ const UNITS = [
   ["seconds", ["секунда", "секунды", "секунд"]],
 ] as const satisfies readonly (readonly [keyof Duration, readonly [string, string, string]])[];
 
+const pad = (value: number) => String(value).padStart(2, "0");
+
 function useNow(stepMs: number) {
   const [now, setNow] = useState<number | null>(null);
 
@@ -57,7 +59,38 @@ function Tiles({ duration }: { duration: Duration | null }) {
   );
 }
 
-export function DateBlock({ label, date, timeZone, mode = "countdown", progress, hint, doneText }: Props) {
+function Big({ duration }: { duration: Duration | null }) {
+  const colon = <span className={styles.colon}>:</span>;
+
+  return (
+    <span className={styles.big}>
+      <span className={styles.days}>{duration?.days ?? "--"}</span>
+      <span className={styles.rest}>
+        <span className={styles.daysUnit}>{plural(duration?.days ?? 0, UNITS[0][1])}</span>
+        <span className={styles.hms}>
+          {duration ? pad(duration.hours) : "--"}
+          {colon}
+          {duration ? pad(duration.minutes) : "--"}
+          {colon}
+          {duration ? pad(duration.seconds) : "--"}
+        </span>
+      </span>
+    </span>
+  );
+}
+
+const LOOKS = { tiles: Tiles, big: Big } as const;
+
+export function DateBlock({
+  label,
+  date,
+  timeZone,
+  mode = "countdown",
+  look = "tiles",
+  progress,
+  hint,
+  doneText,
+}: Props) {
   const now = useNow(mode === "date" ? 60_000 : 1_000);
 
   if (!parseMoment(date)) return null;
@@ -67,6 +100,7 @@ export function DateBlock({ label, date, timeZone, mode = "countdown", progress,
   const barText =
     bar && progress?.replaceAll("{year}", String(bar.year)).replaceAll("{percent}", formatPercent(bar.value));
   const celebrating = state?.done && doneText?.trim();
+  const Look = LOOKS[look];
 
   return (
     <LabeledCard label={label}>
@@ -78,7 +112,7 @@ export function DateBlock({ label, date, timeZone, mode = "countdown", progress,
           {state && now !== null && <span className={styles.caption}>{formatInDays(state.target, now)}</span>}
         </span>
       ) : (
-        <Tiles duration={state ? splitDuration(state.ms) : null} />
+        <Look duration={state ? splitDuration(state.ms) : null} />
       )}
 
       {bar && (

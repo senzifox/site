@@ -1,5 +1,5 @@
 import type { IconName } from "@/components/Icon/icons";
-import type { DateMode } from "@/lib/countdown";
+import type { DateLook, DateMode } from "@/lib/countdown";
 
 export type Social = { icon: IconName; label: string } & ({ href: string } | { copy: string });
 
@@ -42,6 +42,7 @@ export type DateBlock = {
   date: string;
   timeZone: string;
   mode?: DateMode;
+  look?: DateLook;
   progress?: string;
   hint?: string;
   doneText?: string;
