@@ -1,4 +1,5 @@
 import type { IconName } from "@/components/Icon/icons";
+import type { DateMode } from "@/lib/countdown";
 
 export type Social = { icon: IconName; label: string } & ({ href: string } | { copy: string });
 
@@ -35,6 +36,17 @@ export type StatusBlock = { type: "status"; label?: string; text: string; state?
 
 export type ClockBlock = { type: "clock"; label?: string; timeZone: string };
 
+export type DateBlock = {
+  type: "date";
+  label?: string;
+  date: string;
+  timeZone: string;
+  mode?: DateMode;
+  progress?: string;
+  hint?: string;
+  doneText?: string;
+};
+
 export type Block =
   | SpotifyBlock
   | SteamBlock
@@ -44,7 +56,8 @@ export type Block =
   | ListBlock
   | CodeBlock
   | StatusBlock
-  | ClockBlock;
+  | ClockBlock
+  | DateBlock;
 
 export type Site = {
   meta: { title: string; description: string; url: string; locale: string; keywords?: string[] };

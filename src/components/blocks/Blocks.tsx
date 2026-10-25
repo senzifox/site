@@ -2,6 +2,7 @@ import { Fragment } from "react";
 import type { Block } from "@/content/types";
 import { ClockBlock } from "./ClockBlock/ClockBlock";
 import { CodeBlock } from "./CodeBlock/CodeBlock";
+import { DateBlock } from "./DateBlock/DateBlock";
 import { ListBlock } from "./ListBlock/ListBlock";
 import { SpotifyBlock } from "./SpotifyBlock/SpotifyBlock";
 import { StatusBlock } from "./StatusBlock/StatusBlock";
@@ -29,6 +30,8 @@ function renderBlock(block: Block) {
       return <StatusBlock {...block} />;
     case "clock":
       return <ClockBlock {...block} />;
+    case "date":
+      return <DateBlock {...block} />;
     default:
       return block satisfies never;
   }
