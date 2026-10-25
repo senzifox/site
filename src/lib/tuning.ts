@@ -10,6 +10,7 @@ export const tuningStyle = ({
   flashlight,
   cardGlow,
   header,
+  headerCard,
   background,
 }: Tuning = tuning): Record<`--${string}`, string> => ({
   "--spot-strength": `${flashlight.strength}`,
@@ -20,6 +21,10 @@ export const tuningStyle = ({
   "--card-fill-size": `${cardGlow.fill}px`,
   "--card-fill-strength": `${cardGlow.fillStrength}`,
   "--rotate-fade": `${header.fadeMs}ms`,
+  "--header-card-tint": `${headerCard.tint}`,
+  "--header-card-blur": `${headerCard.blur}px`,
+  "--header-card-accent": `${headerCard.accent}`,
+  "--header-card-edge": `${headerCard.edge * 100}%`,
   "--bg-image": `${background.image}`,
   "--bg-image-blur": `${background.blur}px`,
   "--bg-image-x": `${background.focusX}%`,

@@ -32,5 +32,6 @@ export const defaults = {
   copyBurst: { count: 14, distance: [22, 56], duration: [550, 900], size: [2, 5], drop: 14 },
   background: { glow: 0.21, parallax: 0.25, image: 0.41, blur: 0.5, focusX: 30 },
   header: { showMs: 3600, fadeMs: 600 },
+  headerCard: { tint: 0.45, blur: 20, accent: 0.22, edge: 0.28 },
   tail: { seconds: 3.2 },
 };

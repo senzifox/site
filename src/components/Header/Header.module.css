@@ -13,11 +13,14 @@
   position: absolute;
   inset: 0;
   opacity: 0;
-  background: linear-gradient(rgb(255 255 255 / 0.04), rgb(255 255 255 / 0.04)), rgb(var(--head) / 0.45);
+  background:
+    radial-gradient(90% 160% at 18% 0, rgb(var(--glow) / var(--header-card-accent)), transparent 70%),
+    linear-gradient(rgb(255 255 255 / 0.04), rgb(255 255 255 / 0.04)),
+    rgb(var(--head) / var(--header-card-tint));
   border: 1px solid rgb(255 255 255 / 0.08);
-  border-top-color: rgb(255 255 255 / 0.16);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  border-top-color: color-mix(in srgb, var(--accent) var(--header-card-edge), transparent);
+  backdrop-filter: blur(var(--header-card-blur));
+  -webkit-backdrop-filter: blur(var(--header-card-blur));
 }
 
 .glow {

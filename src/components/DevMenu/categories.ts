@@ -145,6 +145,16 @@ export const categories: Category[] = [
         },
       },
       {
+        title: "блок шапки",
+        key: "headerCard",
+        ranges: {
+          tint: { label: "тёмный тон", min: 0, max: 1, step: 0.01 },
+          blur: { label: "размытие", min: 0, max: 40, step: 0.5 },
+          accent: { label: "рыжий отлив", min: 0, max: 1, step: 0.01 },
+          edge: { label: "рыжая кромка", min: 0, max: 1, step: 0.01 },
+        },
+      },
+      {
         title: "хвост",
         key: "tail",
         apply: "tail.tempo",
