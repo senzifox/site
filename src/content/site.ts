@@ -65,9 +65,10 @@ export const site: Site = {
     },
     {
       type: "date",
-      label: "до нового года осталось",
+      label: "до новой годы осталось",
       date: "01-01",
       timeZone: profile.timeZone,
+      look: "big",
       progress: "{year} пройден на {percent}",
       hint: "",
       doneText: "с новым годом!! :3",
