@@ -64,6 +64,15 @@ export const site: Site = {
       href: profile.links.steam,
     },
     {
+      type: "date",
+      label: "до нового года осталось",
+      date: "01-01",
+      timeZone: profile.timeZone,
+      progress: "{year} пройден на {percent}",
+      hint: "",
+      doneText: "с новым годом!! :3",
+    },
+    {
       type: "list",
       label: "то в чём я разбираюсь, или пытаюсь, стек короче",
       items: profile.stack,
