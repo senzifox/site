@@ -1,12 +1,12 @@
 "use client";
 
 import { Icon } from "@/components/Icon/Icon";
+import { ProgressLine } from "@/components/ProgressLine/ProgressLine";
 import type { SpotifyBlock as Props } from "@/content/types";
 import { formatTime } from "@/lib/format";
 import { LiveCard, LiveIdle, LiveLabel } from "../LiveCard/LiveCard";
 import styles from "./SpotifyBlock.module.css";
 import { useSpotify } from "./useSpotify";
-import { Waveform } from "./Waveform";
 
 export function SpotifyBlock({ label, idleText, idleHint, href }: Props) {
   const state = useSpotify();
@@ -39,16 +39,15 @@ export function SpotifyBlock({ label, idleText, idleHint, href }: Props) {
                 <span className={styles.title}>{track.title}</span>
                 <span className={styles.artist}>{artists}</span>
               </div>
-              <div className={styles.progress}>
-                <Waveform
-                  key={track.songUrl || `${track.title}:${artists}:${track.durationMs}`}
-                  progress={track.progressMs / track.durationMs}
-                />
-                <div className={styles.time}>
+              <ProgressLine
+                key={track.songUrl || `${track.title}:${artists}:${track.durationMs}`}
+                value={track.progressMs / track.durationMs}
+              >
+                <span className={styles.time}>
                   <span>{formatTime(track.progressMs)}</span>
                   <span>{formatTime(track.durationMs)}</span>
-                </div>
-              </div>
+                </span>
+              </ProgressLine>
             </div>
           </a>
         )

@@ -18,4 +18,11 @@
   border-radius: inherit;
   background: var(--accent);
   box-shadow: 0 0 10px rgb(var(--glow) / 0.8);
+  transition: width 1s linear;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fill {
+    transition: none;
+  }
 }

@@ -57,62 +57,12 @@
   color: color-mix(in srgb, var(--text-strong) 42%, transparent);
 }
 
-.progress {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.wave {
-  position: relative;
-  height: 24px;
-}
-
-.bars {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  gap: 2px;
-}
-
-.bar {
-  flex: 1;
-  min-height: 3px;
-  border-radius: 1px;
-  background: rgb(255 255 255 / 0.14);
-  transition: background 200ms;
-}
-
-.played {
-  background: var(--accent);
-}
-
-.headTrack {
-  position: absolute;
-  inset: -3px 0;
-  transition: transform 1s linear;
-}
-
-.head {
-  width: 2px;
-  height: 100%;
-  margin-left: -1px;
-  border-radius: 1px;
-  background: var(--text-strong);
-}
-
 .time {
   display: flex;
   justify-content: space-between;
-  font-size: 11px;
-  line-height: 14px;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 13px;
+  line-height: 18px;
   font-variant-numeric: tabular-nums;
   color: var(--text-muted);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .headTrack {
-    transition: none;
-  }
 }
