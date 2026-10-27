@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { LabeledCard } from "@/components/Card/Card";
+import { ProgressLine } from "@/components/ProgressLine/ProgressLine";
 import type { DateBlock as Props } from "@/content/types";
 import {
   type Duration,
@@ -116,12 +117,9 @@ export function DateBlock({
       )}
 
       {bar && (
-        <span className={styles.progress}>
-          <span className={styles.track}>
-            <span className={styles.fill} style={{ width: formatPercent(bar.value) }} />
-          </span>
+        <ProgressLine value={bar.value}>
           <span className={styles.caption}>{barText}</span>
-        </span>
+        </ProgressLine>
       )}
 
       {hint?.trim() && <span className={styles.caption}>{hint}</span>}
