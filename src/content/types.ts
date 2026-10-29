@@ -48,6 +48,8 @@ export type DateBlock = {
   doneText?: string;
 };
 
+export type ProjectDetails = { icon?: string; blocks?: Block[] };
+
 export type Block =
   | SpotifyBlock
   | SteamBlock
