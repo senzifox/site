@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { Background } from "@/components/Background/Background";
 import { Card } from "@/components/Card/Card";
+import { HomeLink } from "@/components/HomeLink/HomeLink";
 import styles from "./not-found.module.css";
 
 export const metadata: Metadata = {
@@ -17,9 +17,7 @@ export default function NotFound() {
         <Card className={styles.card}>
           <span className={styles.code}>404</span>
           <p className={styles.text}>такой страницы нет(</p>
-          <Link className={styles.link} href="/">
-            $ cd ~
-          </Link>
+          <HomeLink className={styles.link} />
         </Card>
       </main>
     </>
