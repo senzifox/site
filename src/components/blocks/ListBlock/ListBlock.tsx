@@ -1,6 +1,6 @@
 import { LabeledCard } from "@/components/Card/Card";
+import { Chips } from "@/components/Chips/Chips";
 import type { ListBlock as Props } from "@/content/types";
-import styles from "./ListBlock.module.css";
 
 export function ListBlock({ label, items }: Props) {
   const entries = items.map((item) => item.trim()).filter(Boolean);
@@ -9,13 +9,7 @@ export function ListBlock({ label, items }: Props) {
 
   return (
     <LabeledCard label={label}>
-      <ul className={styles.items}>
-        {entries.map((item) => (
-          <li key={item} className={styles.item}>
-            {item}
-          </li>
-        ))}
-      </ul>
+      <Chips items={entries} />
     </LabeledCard>
   );
 }
