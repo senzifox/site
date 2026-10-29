@@ -22,6 +22,12 @@ const config = (phase: string): NextConfig => ({
     BUILD_SHA: process.env.GIT_SHA || gitSha(),
     BUILD_TIME: new Date().toISOString(),
   },
+  images: {
+    remotePatterns: [new URL("https://raw.githubusercontent.com/senzifox/**")],
+    formats: ["image/avif", "image/webp"],
+    unoptimized: phase === PHASE_DEVELOPMENT_SERVER,
+  },
+  experimental: { isrFlushToDisk: false },
   pageExtensions: phase === PHASE_DEVELOPMENT_SERVER ? ["dev.ts", ...pageExtensions] : pageExtensions,
 });
 

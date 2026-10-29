@@ -15,6 +15,10 @@ export const iconSources = {
   copy: "material-symbols:content-copy-rounded",
   check: "material-symbols:check-rounded",
   openInNew: "material-symbols:open-in-new-rounded",
+  chevronRight: "material-symbols:chevron-right-rounded",
+  download: "material-symbols:download-rounded",
+  curseforge: "simple-icons:curseforge",
+  modrinth: "simple-icons:modrinth",
 } satisfies Record<string, IconSource>;
 
 export const setScale: Record<string, number> = {

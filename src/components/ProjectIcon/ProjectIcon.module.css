@@ -1,0 +1,19 @@
+.icon {
+  width: 120px;
+  height: 120px;
+  flex: none;
+  border-radius: var(--radius-sm);
+  object-fit: cover;
+  background: rgb(255 255 255 / 0.06);
+}
+
+.letter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 56px;
+  font-weight: 700;
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+}

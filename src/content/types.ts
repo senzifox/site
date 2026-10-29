@@ -48,6 +48,8 @@ export type DateBlock = {
   doneText?: string;
 };
 
+export type ProjectsBlock = { type: "projects"; label?: string };
+
 export type ProjectDetails = { icon?: string; blocks?: Block[] };
 
 export type Block =
@@ -60,7 +62,8 @@ export type Block =
   | CodeBlock
   | StatusBlock
   | ClockBlock
-  | DateBlock;
+  | DateBlock
+  | ProjectsBlock;
 
 export type Site = {
   meta: { title: string; description: string; url: string; locale: string; keywords?: string[] };
