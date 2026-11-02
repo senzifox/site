@@ -2,7 +2,7 @@ FROM node:26-alpine AS base
 ENV NEXT_TELEMETRY_DISABLED=1
 WORKDIR /app
 COPY package.json ./
-RUN corepack enable && corepack install && pnpm --version
+RUN npm install -g corepack && corepack enable && corepack install && pnpm --version
 
 FROM base AS deps
 COPY package.json pnpm-lock.yaml ./
