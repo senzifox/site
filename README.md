@@ -15,7 +15,7 @@ next.js 16 (app router, standalone output), react 19, typescript
 css modules, motion  
 leva for dev menu  
 biome, vitest  
-pnpm, node 24  
+pnpm, node 26  
 docker, github actions, ghcr, nginx
 
 ## layout
@@ -42,24 +42,24 @@ pnpm dev
 
 `.env.local` needs just for spotify and steam blocks, without them the blocks just stay idle
 
-| variable | where to get it |
-| --- | --- |
+| variable                                     | where to get it                                                                                                        |
+| -------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
 | `SPOTIFY_CLIENT_ID`, `SPOTIFY_CLIENT_SECRET` | [spotify developer dashboard](https://developer.spotify.com/dashboard/), redirect url `http://127.0.0.1:8888/callback` |
-| `SPOTIFY_REFRESH_TOKEN` | `pnpm spotify:auth` |
-| `STEAM_API_KEY` | [steam web api key](https://steamcommunity.com/dev/apikey) |
-| `STEAM_ID` | [64-bit id or vanity name from the profile url](https://steamdb.com/en/tools/steam-id-finder) |
+| `SPOTIFY_REFRESH_TOKEN`                      | `pnpm spotify:auth`                                                                                                    |
+| `STEAM_API_KEY`                              | [steam web api key](https://steamcommunity.com/dev/apikey)                                                             |
+| `STEAM_ID`                                   | [64-bit id or vanity name from the profile url](https://steamdb.com/en/tools/steam-id-finder)                          |
 
 ## scripts
 
-| command | what it does |
-| --- | --- |
-| `pnpm check` | lint, typecheck and tests |
-| `pnpm avatar` | builds the avatar, its silhouette, the cutout and favicons from `assets/avatar` |
-| `pnpm background` | compresses the background from `assets/background` into avif and webp |
-| `pnpm icons` | regenerates the icon subset from iconify |
-| `pnpm tail` | regenerates the footer tail animation |
-| `pnpm fox` | regenerates the ascii fox for the terminal version |
-| `pnpm docker:local` | builds the image and runs it with `.env.local` |
+| command             | what it does                                                                    |
+| ------------------- | ------------------------------------------------------------------------------- |
+| `pnpm check`        | lint, typecheck and tests                                                       |
+| `pnpm avatar`       | builds the avatar, its silhouette, the cutout and favicons from `assets/avatar` |
+| `pnpm background`   | compresses the background from `assets/background` into avif and webp           |
+| `pnpm icons`        | regenerates the icon subset from iconify                                        |
+| `pnpm tail`         | regenerates the footer tail animation                                           |
+| `pnpm fox`          | regenerates the ascii fox for the terminal version                              |
+| `pnpm docker:local` | builds the image and runs it with `.env.local`                                  |
 
 ## dev menu
 

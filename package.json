@@ -2,9 +2,9 @@
   "name": "site",
   "private": true,
   "type": "module",
-  "packageManager": "pnpm@12.8.1",
+  "packageManager": "pnpm@12.16.1",
   "engines": {
-    "node": ">=24"
+    "node": ">=26"
   },
   "scripts": {
     "dev": "next dev",
@@ -24,24 +24,24 @@
     "docker:local": "docker build -f deploy/Dockerfile -t site:local . && IMAGE=site:local docker compose -f deploy/compose.yaml --env-file .env.local up -d"
   },
   "dependencies": {
-    "motion": "^13.5.0",
-    "next": "^16.3.8",
-    "react": "^19.3.0",
-    "react-dom": "^19.3.0",
+    "motion": "^14.9.0",
+    "next": "^16.4.3",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
     "sharp": "^0.35.5"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.5.15",
-    "@iconify-json/material-symbols": "^1.2.93",
-    "@iconify-json/simple-icons": "^1.2.98",
+    "@biomejs/biome": "^2.6.4",
+    "@iconify-json/material-symbols": "^1.2.97",
+    "@iconify-json/simple-icons": "^1.2.101",
     "@iconify/types": "^2.0.0",
     "@iconify/utils": "^3.1.7",
-    "@types/node": "^26.6.4",
+    "@types/node": "^26.6.6",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "leva": "^0.10.1",
     "potrace": "^2.1.8",
     "typescript": "^7.0.2",
-    "vitest": "^5.0.3"
+    "vitest": "^5.0.5"
   }
 }
