@@ -1,3 +1,30 @@
 import type { ProjectDetails } from "./types";
 
-export const projectDetails: Record<string, ProjectDetails> = {};
+export const projectDetails: Record<string, ProjectDetails> = {
+  foxyfriends: {
+    icon: "src/main/resources/assets/foxyfriends/icon.png",
+    blocks: [
+      {
+        type: "text",
+        title: "пысы. лисы более дружелюбны чем люди",
+      },
+      {
+        type: "text",
+        title: "описание",
+        text: "мод добавляет в майнкрафт возможность приручать лис которые будут помогать вам приключениях",
+      },
+      {
+        type: "list",
+        label: "требования",
+        items: ["minecraft 26.3", "fabric loader 0.20.1+", "fabric api 0.165.0+"],
+      },
+      {
+        type: "link",
+        icon: "curseforge",
+        label: "curseforge",
+        value: "foxyfriends",
+        href: "https://www.curseforge.com/minecraft/mc-mods/foxyfriends",
+      },
+    ],
+  },
+};

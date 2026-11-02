@@ -79,6 +79,10 @@ export const site: Site = {
       items: profile.stack,
     },
     {
+      type: "projects",
+      label: "проектиксы",
+    },
+    {
       type: "copy",
       icon: "mail",
       label: "сюда можно деловые предложения закинуть, но лучше в телеграмм",
