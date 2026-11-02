@@ -23,10 +23,11 @@ docker, github actions, ghcr, nginx
 ```
 deploy/           dockerfile, compose, deploy script and nginx config
 scripts/          generators for the avatar, background, icons, footer tail and ascii fox
+src/app/[slug]/   project pages built from github repos, download redirects
 src/app/api/      spotify, steam and health endpoints, dev-only tuning and presets routes
 src/app/terminal/ plain-text pages for curl, wget and friends
 src/components/   ui and content blocks, the dev menu
-src/content/      texts, links, theme, terminal layout
+src/content/      texts, links, project details, theme, terminal layout
 src/lib/          data providers, terminal renderer, effect defaults and tuning
 src/proxy.ts      user-agent routing between the site and the terminal version
 ```
