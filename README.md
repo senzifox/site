@@ -40,7 +40,7 @@ cp .env.example .env.local
 pnpm dev
 ```
 
-`.env.local` needs just for spotify and steam blocks, without them the blocks just stay idle
+`.env.local` needs just for spotify and steam blocks, without them the blocks just stay idle, project block and pages work without them, but unauthenticated github api allows only 60 requests per hour per ip (with the current update timer, this limit wont be reached, but still)
 
 | variable                                     | where to get it                                                                                                        |
 | -------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
@@ -48,6 +48,7 @@ pnpm dev
 | `SPOTIFY_REFRESH_TOKEN`                      | `pnpm spotify:auth`                                                                                                    |
 | `STEAM_API_KEY`                              | [steam web api key](https://steamcommunity.com/dev/apikey)                                                             |
 | `STEAM_ID`                                   | [64-bit id or vanity name from the profile url](https://steamdb.com/en/tools/steam-id-finder)                          |
+| `GITHUB_TOKEN`                               | [fine-grained token](https://github.com/settings/personal-access-tokens), public repositories read-only                |
 
 ## scripts
 
