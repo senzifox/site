@@ -3,6 +3,7 @@ import type { ProjectDetails } from "./types";
 export const projectDetails: Record<string, ProjectDetails> = {
   foxyfriends: {
     icon: "src/main/resources/assets/foxyfriends/icon.png",
+    wiki: { ru: "wiki/ru.md", en: "wiki/en.md" },
     blocks: [
       {
         type: "text",
