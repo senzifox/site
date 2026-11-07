@@ -1,7 +1,6 @@
-import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cache } from "react";
-import { alt, size } from "@/app/opengraph-image";
 import { Background } from "@/components/Background/Background";
 import { Blocks } from "@/components/blocks/Blocks";
 import { Card } from "@/components/Card/Card";
@@ -12,6 +11,8 @@ import { Icon } from "@/components/Icon/Icon";
 import { ProjectIcon } from "@/components/ProjectIcon/ProjectIcon";
 import { site } from "@/content/site";
 import { getProjectPage, getProjectsOrNone } from "@/lib/github/projects";
+import { wikiLangs, wikiPath } from "@/lib/github/wiki";
+import { pageMetadata } from "@/lib/metadata";
 import styles from "./page.module.css";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -26,27 +27,9 @@ const loadProject = cache(async (slug: string) => {
   return project;
 });
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata({ params }: Props) {
   const { slug, name, description } = await loadProject((await params).slug);
-  const title = `${name} · ${site.header.name}`;
-  const path = `/${slug}`;
-  const images = [{ url: "/opengraph-image", alt, ...size }];
-
-  return {
-    title,
-    description,
-    alternates: { canonical: path },
-    openGraph: {
-      type: "website",
-      url: path,
-      siteName: site.header.name,
-      title,
-      description,
-      locale: site.meta.locale,
-      images,
-    },
-    twitter: { card: "summary_large_image", title, description, images },
-  };
+  return pageMetadata({ title: `${name} · ${site.header.name}`, description, path: `/${slug}` });
 }
 
 const isExternal = (url: string) => {
@@ -58,9 +41,9 @@ const isExternal = (url: string) => {
 };
 
 export default async function ProjectPage({ params }: Props) {
-  const { slug, name, description, topics, url, homepage, icon, blocks, release } = await loadProject(
-    (await params).slug,
-  );
+  const project = await loadProject((await params).slug);
+  const { slug, name, description, topics, url, homepage, icon, blocks, release } = project;
+  const [wikiLang] = wikiLangs(project);
 
   return (
     <>
@@ -82,6 +65,11 @@ export default async function ProjectPage({ params }: Props) {
                 <Icon name="download" size={20} />
                 скачать {release.tag}
               </a>
+            )}
+            {wikiLang && (
+              <Link className={styles.action} href={wikiPath(slug, wikiLang)} aria-label="вики">
+                <Icon name="wiki" size={20} />
+              </Link>
             )}
             <a
               className={styles.action}

@@ -50,7 +50,9 @@ export type DateBlock = {
 
 export type ProjectsBlock = { type: "projects"; label?: string };
 
-export type ProjectDetails = { icon?: string; blocks?: Block[] };
+export type WikiLang = "ru" | "en";
+
+export type ProjectDetails = { icon?: string; blocks?: Block[]; wiki?: Partial<Record<WikiLang, string>> };
 
 export type Block =
   | SpotifyBlock

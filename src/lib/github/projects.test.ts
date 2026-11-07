@@ -38,15 +38,18 @@ describe("toProjects", () => {
       homepage: null,
       icon: null,
       blocks: [],
+      wiki: {},
     });
   });
 
   it("adds local details to the matching repo", () => {
     const blocks = [{ type: "text" as const, text: "hi" }];
-    const [project] = toProjects([repo("Mod")], "fox", { mod: { icon: "./assets/icon.png", blocks } });
+    const wiki = { ru: "wiki/ru.md" };
+    const [project] = toProjects([repo("Mod")], "fox", { mod: { icon: "./assets/icon.png", blocks, wiki } });
     expect(project).toMatchObject({
       icon: "https://raw.githubusercontent.com/fox/Mod/HEAD/assets/icon.png",
       blocks,
+      wiki,
     });
   });
 });

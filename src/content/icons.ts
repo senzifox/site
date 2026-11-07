@@ -17,6 +17,7 @@ export const iconSources = {
   openInNew: "material-symbols:open-in-new-rounded",
   chevronRight: "material-symbols:chevron-right-rounded",
   download: "material-symbols:download-rounded",
+  wiki: "material-symbols:menu-book-rounded",
   curseforge: "simple-icons:curseforge",
   modrinth: "simple-icons:modrinth",
 } satisfies Record<string, IconSource>;

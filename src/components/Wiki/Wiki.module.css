@@ -1,0 +1,116 @@
+.wiki {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.section {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 16px;
+  line-height: 24px;
+  text-wrap: pretty;
+}
+
+.section h1,
+.section h2,
+.section h3,
+.section ul,
+.section ol {
+  margin: 0;
+}
+
+.section h1,
+.section h2,
+.section h3 {
+  scroll-margin-top: 24px;
+}
+
+.section h1 {
+  font-size: 34px;
+  line-height: 40px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: var(--text-strong);
+}
+
+.section h2 {
+  font-size: 20px;
+  line-height: 28px;
+  font-weight: 700;
+  color: var(--text-strong);
+}
+
+.section h3 {
+  margin-top: 6px;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+  color: var(--accent);
+}
+
+.section ul,
+.section ol {
+  padding-left: 20px;
+}
+
+.section li + li {
+  margin-top: 4px;
+}
+
+.section li::marker {
+  color: var(--text-muted);
+}
+
+.section a {
+  color: var(--accent);
+}
+
+.section a:hover {
+  text-decoration: underline;
+}
+
+.section strong,
+.section em {
+  color: var(--text-strong);
+}
+
+.section code {
+  padding: 1px 6px;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.875em;
+  color: var(--text-strong);
+  border-radius: 6px;
+  background: rgb(255 255 255 / 0.06);
+  overflow-wrap: anywhere;
+}
+
+.table {
+  overflow-x: auto;
+}
+
+.table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+  line-height: 22px;
+}
+
+.table th,
+.table td {
+  padding: 6px 12px 6px 0;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid rgb(255 255 255 / 0.08);
+}
+
+.table th {
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.table tr:last-child td {
+  border-bottom: 0;
+}

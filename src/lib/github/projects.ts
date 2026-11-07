@@ -1,6 +1,6 @@
 import { profile } from "@/content/profile";
 import { projectDetails } from "@/content/projects";
-import type { Block, ProjectDetails } from "@/content/types";
+import type { Block, ProjectDetails, WikiLang } from "@/content/types";
 import { HttpError } from "@/lib/http";
 
 export const PROJECTS_REVALIDATE_S = 900;
@@ -17,6 +17,7 @@ export type Project = {
   homepage: string | null;
   icon: string | null;
   blocks: Block[];
+  wiki: Partial<Record<WikiLang, string>>;
 };
 
 export type ProjectRelease = { tag: string; page: string; asset: string | null };
@@ -55,7 +56,7 @@ export const toProjects = (
     .sort((a, b) => b.pushed_at.localeCompare(a.pushed_at))
     .map((repo) => {
       const slug = repo.name.toLowerCase();
-      const { icon, blocks = [] } = details[slug] ?? {};
+      const { icon, blocks = [], wiki = {} } = details[slug] ?? {};
       return {
         slug,
         name: repo.name,
@@ -66,6 +67,7 @@ export const toProjects = (
         homepage: repo.homepage?.trim() || null,
         icon: icon ? rawUrl(repo.full_name, icon) : null,
         blocks,
+        wiki,
       };
     });
 
@@ -88,6 +90,17 @@ const githubFetch = async (what: string, url: string) => {
   if (response.status === 404) return null;
   if (!response.ok) throw new HttpError(what, response);
   return response;
+};
+
+export const getRawText = async (repo: string, path: string) => {
+  const response = await fetch(rawUrl(repo, path), {
+    next: { revalidate: PROJECTS_REVALIDATE_S },
+    signal: AbortSignal.timeout(TIMEOUT_MS),
+    headers: { "User-Agent": "senzi.dev" },
+  });
+  if (response.status === 404) return null;
+  if (!response.ok) throw new HttpError("GitHub raw", response);
+  return response.text();
 };
 
 export const getProjects = async () => {
