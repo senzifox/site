@@ -64,23 +64,13 @@ export const site: Site = {
       href: profile.links.steam,
     },
     {
-      type: "date",
-      label: "до новой годы осталось",
-      date: "01-01",
-      timeZone: profile.timeZone,
-      look: "big",
-      progress: "{year} пройден на {percent}",
-      hint: "",
-      doneText: "с новым годом!! :3",
+      type: "projects",
+      label: "проектиксы",
     },
     {
       type: "list",
       label: "то в чём я разбираюсь, или пытаюсь, стек короче",
       items: profile.stack,
-    },
-    {
-      type: "projects",
-      label: "проектиксы",
     },
     {
       type: "copy",
@@ -98,6 +88,7 @@ export const site: Site = {
     //  { type: "clock", label: "у меня ща:", timeZone: "Europe/Moscow", },
     //  { type: "code", label: "neofetch", lines: ["тут типа в будущем можно код написать, пока не придумал что сюда"] },
     //  { type: "link", icon: "github", label: "github", value: "senzifox/заглушка", href: "https://github.com/senzifox" },
+    //  { type: "date", label: "до новой годы осталось", date: "01-01", timeZone: profile.timeZone, look: "big", progress: "{year} пройден на {percent}", hint: "", doneText: "с новым годом!! :3" },
   ],
   footer: {
     text: "сензифокс ©",
