@@ -13,6 +13,7 @@
   --radius-card: 14px;
   --radius-sm: 10px;
   --container: 440px;
+  --container-wide: 720px;
   --gutter: 16px;
   color-scheme: dark;
 }
