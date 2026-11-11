@@ -1,7 +1,8 @@
 import { profile } from "@/content/profile";
 import { projectDetails } from "@/content/projects";
-import type { Block, ProjectDetails, WikiLang } from "@/content/types";
+import type { Block, Lang, ProjectDetails } from "@/content/types";
 import { HttpError } from "@/lib/http";
+import { DEFAULT_LANG, LANG_PARAM, LANGS, langPath } from "@/lib/lang";
 
 export const PROJECTS_REVALIDATE_S = 900;
 
@@ -16,8 +17,8 @@ export type Project = {
   url: string;
   homepage: string | null;
   icon: string | null;
-  blocks: Block[];
-  wiki: Partial<Record<WikiLang, string>>;
+  blocks: Partial<Record<Lang, Block[]>>;
+  wiki: Partial<Record<Lang, string>>;
 };
 
 export type ProjectRelease = { tag: string; page: string; asset: string | null };
@@ -56,7 +57,7 @@ export const toProjects = (
     .sort((a, b) => b.pushed_at.localeCompare(a.pushed_at))
     .map((repo) => {
       const slug = repo.name.toLowerCase();
-      const { icon, blocks = [], wiki = {} } = details[slug] ?? {};
+      const { icon, blocks = {}, wiki = {} } = details[slug] ?? {};
       return {
         slug,
         name: repo.name,
@@ -70,6 +71,14 @@ export const toProjects = (
         wiki,
       };
     });
+
+export const projectPath = (slug: string, lang: Lang) => langPath(`/${slug}`, lang);
+
+export const projectLangChoice = (slug: string, lang: Lang) =>
+  `${projectPath(slug, DEFAULT_LANG)}?${LANG_PARAM}=${lang}`;
+
+export const projectLangs = ({ blocks }: Pick<Project, "blocks">) =>
+  LANGS.filter((lang) => lang === DEFAULT_LANG || blocks[lang]);
 
 export const toRelease = (release: GithubRelease): ProjectRelease => {
   const asset = release.assets.find(({ name }) => !/sources|javadoc|-dev\b/i.test(name)) ?? release.assets[0];

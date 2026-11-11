@@ -1,0 +1,30 @@
+.switch {
+  display: flex;
+  overflow: hidden;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+  border: 1px solid rgb(255 255 255 / 0.08);
+  border-radius: var(--radius-sm);
+  background: rgb(255 255 255 / 0.04);
+}
+
+.lang {
+  padding: 8px 12px;
+  color: var(--text-muted);
+  transition:
+    background 150ms,
+    color 150ms;
+}
+
+.lang:hover {
+  color: var(--text-strong);
+  background: rgb(255 255 255 / 0.08);
+}
+
+.current,
+.current:hover {
+  color: var(--text-strong);
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+}

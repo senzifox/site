@@ -1,7 +1,7 @@
 import Markdown, { type Components, defaultUrlTransform } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Card } from "@/components/Card/Card";
-import type { WikiLang } from "@/content/types";
+import type { Lang } from "@/content/types";
 import { rehypeWikiSections, resolveWikiUrl, type WikiSource } from "@/lib/github/wiki";
 import styles from "./Wiki.module.css";
 
@@ -24,7 +24,7 @@ const components: Components = {
   ),
 };
 
-type Props = { markdown: string; lang: WikiLang; source: WikiSource };
+type Props = { markdown: string; lang: Lang; source: WikiSource };
 
 export function Wiki({ markdown, lang, source }: Props) {
   return (

@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { type GithubRepo, toProjects, toRelease } from "./projects";
+import {
+  type GithubRepo,
+  projectLangChoice,
+  projectLangs,
+  projectPath,
+  toProjects,
+  toRelease,
+} from "./projects";
 
 const repo = (name: string, overrides: Partial<GithubRepo> = {}): GithubRepo => ({
   name,
@@ -37,13 +44,13 @@ describe("toProjects", () => {
       topics: ["java"],
       homepage: null,
       icon: null,
-      blocks: [],
+      blocks: {},
       wiki: {},
     });
   });
 
   it("adds local details to the matching repo", () => {
-    const blocks = [{ type: "text" as const, text: "hi" }];
+    const blocks = { ru: [{ type: "text" as const, text: "hi" }] };
     const wiki = { ru: "wiki/ru.md" };
     const [project] = toProjects([repo("Mod")], "fox", { mod: { icon: "./assets/icon.png", blocks, wiki } });
     expect(project).toMatchObject({
@@ -67,5 +74,18 @@ describe("toRelease", () => {
 
   it("has no asset without files", () => {
     expect(toRelease(release([])).asset).toBeNull();
+  });
+});
+
+describe("project languages", () => {
+  it("always has russian and adds languages with their own blocks", () => {
+    expect(projectLangs({ blocks: {} })).toEqual(["ru"]);
+    expect(projectLangs({ blocks: { en: [] } })).toEqual(["ru", "en"]);
+  });
+
+  it("keeps russian at the bare slug and chooses a language through the russian page", () => {
+    expect(projectPath("mod", "ru")).toBe("/mod");
+    expect(projectPath("mod", "en")).toBe("/mod/en");
+    expect(projectLangChoice("mod", "en")).toBe("/mod?lang=en");
   });
 });

@@ -10,8 +10,11 @@
   gap: 12px;
 }
 
-.home {
-  align-self: flex-start;
+.bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
 }
 
 .hero {

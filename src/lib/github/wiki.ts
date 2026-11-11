@@ -1,14 +1,10 @@
-import type { WikiLang } from "@/content/types";
+import type { Lang } from "@/content/types";
+import { LANGS, langPath } from "@/lib/lang";
 import { findProject, getRawText, type Project, rawUrl } from "./projects";
 
-export const WIKI_LANGS: readonly WikiLang[] = ["ru", "en"];
+export const wikiPath = (slug: string, lang: Lang) => langPath(`/${slug}/wiki`, lang);
 
-export const DEFAULT_WIKI_LANG: WikiLang = "ru";
-
-export const wikiPath = (slug: string, lang: WikiLang) =>
-  lang === DEFAULT_WIKI_LANG ? `/${slug}/wiki` : `/${slug}/wiki/${lang}`;
-
-export const wikiLangs = ({ wiki }: Pick<Project, "wiki">) => WIKI_LANGS.filter((lang) => wiki[lang]);
+export const wikiLangs = ({ wiki }: Pick<Project, "wiki">) => LANGS.filter((lang) => wiki[lang]);
 
 export const githubSlug = (text: string) =>
   text
@@ -43,7 +39,7 @@ export const resolveWikiUrl = (url: string, kind: "href" | "src", { slug, repo, 
   const target = hashAt < 0 ? url : url.slice(0, hashAt);
   const path = new URL(target, `${REPO_ORIGIN}/${file}`).pathname.slice(1);
   if (kind === "src") return rawUrl(repo, path);
-  const lang = WIKI_LANGS.find((candidate) => wiki[candidate] === decodeURIComponent(path));
+  const lang = LANGS.find((candidate) => wiki[candidate] === decodeURIComponent(path));
   if (lang) return `${wikiPath(slug, lang)}${hash}`;
   return `https://github.com/${repo}/blob/HEAD/${path}${hash}`;
 };
@@ -81,9 +77,9 @@ export const rehypeWikiSections = () => (tree: HastNode) => {
   tree.children = sections.filter((nodes) => nodes.some(({ type }) => type === "element")).map(section);
 };
 
-export type WikiPage = { project: Project; lang: WikiLang; file: string; markdown: string };
+export type WikiPage = { project: Project; lang: Lang; file: string; markdown: string };
 
-export const getWikiPage = async (slug: string, lang: WikiLang): Promise<WikiPage | null> => {
+export const getWikiPage = async (slug: string, lang: Lang): Promise<WikiPage | null> => {
   const project = await findProject(slug);
   const file = project?.wiki[lang];
   if (!project || !file) return null;
