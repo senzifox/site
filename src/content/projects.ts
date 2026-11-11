@@ -21,6 +21,13 @@ export const projectDetails: Record<string, ProjectDetails> = {
       },
       {
         type: "link",
+        icon: "modrinth",
+        label: "modrinth",
+        value: "foxyfriends",
+        href: "https://modrinth.com/mod/foxyfriends",
+      },
+      {
+        type: "link",
         icon: "curseforge",
         label: "curseforge",
         value: "foxyfriends",
