@@ -1,0 +1,18 @@
+[Unit]
+Description=senzi.dev goaccess report
+
+[Service]
+Type=oneshot
+User=goaccess
+Group=goaccess
+SupplementaryGroups=adm
+StateDirectory=goaccess
+ExecStart=/usr/local/bin/senzi-stats
+Nice=10
+IOSchedulingClass=idle
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ReadWritePaths=/var/www/senzi-stats

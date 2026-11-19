@@ -21,7 +21,7 @@ docker, github actions, ghcr, nginx
 ## layout
 
 ```
-deploy/           dockerfile, compose, deploy script and nginx config
+deploy/           dockerfile, compose, deploy script, nginx config and goaccess stats
 scripts/          generators for the avatar, background, icons, footer tail and ascii fox
 src/app/[slug]/   project pages built from github repos, download redirects
 src/app/api/      spotify, steam and health endpoints, dev-only tuning and presets routes
