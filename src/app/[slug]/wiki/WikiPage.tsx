@@ -6,11 +6,10 @@ import { Footer } from "@/components/Footer/Footer";
 import { HomeLink } from "@/components/HomeLink/HomeLink";
 import { LangSwitch } from "@/components/LangSwitch/LangSwitch";
 import { Wiki } from "@/components/Wiki/Wiki";
-import { site } from "@/content/site";
+import { sites } from "@/content/sites";
 import type { Lang } from "@/content/types";
-import { getProjectsOrNone, projectLangs, projectPath } from "@/lib/github/projects";
-import { getWikiPage, wikiLangs, wikiPath } from "@/lib/github/wiki";
-import { DEFAULT_LANG, LOCALES } from "@/lib/lang";
+import { getProjectsOrNone, projectDescription, projectPathIn } from "@/lib/github/projects";
+import { getWikiPage, wikiLangChoice, wikiLangs, wikiPath } from "@/lib/github/wiki";
 import { pageMetadata } from "@/lib/metadata";
 import styles from "../page.module.css";
 
@@ -30,29 +29,30 @@ export const wikiStaticParams = async (lang: Lang) =>
 export const wikiMetadata = async (slug: string, lang: Lang): Promise<Metadata> => {
   const { project } = await loadWiki(slug, lang);
   return pageMetadata({
-    title: `${project.name} ${TITLE[lang]} · ${site.header.name}`,
-    description: project.description,
+    title: `${project.name} ${TITLE[lang]} · ${sites[lang].header.name}`,
+    description: projectDescription(project, lang),
     path: wikiPath(slug, lang),
-    locale: LOCALES[lang],
+    lang,
     languages: Object.fromEntries(wikiLangs(project).map((each) => [each, wikiPath(slug, each)])),
   });
 };
 
 export async function WikiPage({ slug, lang }: { slug: string; lang: Lang }) {
   const { project, file, markdown } = await loadWiki(slug, lang);
-  const back = projectPath(slug, projectLangs(project).includes(lang) ? lang : DEFAULT_LANG);
-  const langLinks = Object.fromEntries(wikiLangs(project).map((each) => [each, wikiPath(slug, each)]));
+  const back = projectPathIn(project, lang);
+  const langLinks = Object.fromEntries(wikiLangs(project).map((each) => [each, wikiLangChoice(slug, each)]));
+  const { footer } = sites[lang];
 
   return (
     <>
       <Background />
-      <main className={styles.main}>
+      <main className={styles.main} lang={lang}>
         <div className={styles.bar}>
           <HomeLink href={back} label="$ cd .." />
           <LangSwitch current={lang} links={langLinks} />
         </div>
         <Wiki markdown={markdown} lang={lang} source={{ ...project, file }} />
-        {site.footer && <Footer {...site.footer} />}
+        {footer && <Footer {...footer} lang={lang} />}
       </main>
     </>
   );

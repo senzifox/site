@@ -1,3 +1,6 @@
+import type { Lang } from "@/content/types";
+import { DEFAULT_LANG, INTL_LOCALES } from "@/lib/lang";
+
 export type DateMode = "countdown" | "since" | "date";
 
 export type DateLook = "tiles" | "big";
@@ -111,17 +114,23 @@ export const splitDuration = (ms: number): Duration => {
   };
 };
 
-const rules = new Intl.PluralRules("ru-RU");
+export type PluralForms = Partial<Record<Intl.LDMLPluralRule, string>> & { other: string };
 
-export const plural = (count: number, [one, few, many]: readonly [string, string, string]) => {
-  const form = rules.select(count);
-  return form === "one" ? one : form === "few" ? few : many;
-};
+export const plural = (count: number, forms: PluralForms, lang: Lang = DEFAULT_LANG) =>
+  forms[new Intl.PluralRules(INTL_LOCALES[lang]).select(count)] ?? forms.other;
 
 export const formatPercent = (value: number) => `${(Math.min(1, Math.max(0, value)) * 100).toFixed(1)}%`;
 
-export const formatLongDate = (timeZone: string, at: number) =>
-  new Intl.DateTimeFormat("ru-RU", { timeZone, day: "numeric", month: "long", year: "numeric" }).format(at);
+export const formatLongDate = (timeZone: string, at: number, lang: Lang = DEFAULT_LANG) =>
+  new Intl.DateTimeFormat(INTL_LOCALES[lang], {
+    timeZone,
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(at);
 
-export const formatInDays = (target: number, now: number) =>
-  new Intl.RelativeTimeFormat("ru", { numeric: "auto" }).format(Math.trunc((target - now) / DAY_MS), "day");
+export const formatInDays = (target: number, now: number, lang: Lang = DEFAULT_LANG) =>
+  new Intl.RelativeTimeFormat(INTL_LOCALES[lang], { numeric: "auto" }).format(
+    Math.trunc((target - now) / DAY_MS),
+    "day",
+  );

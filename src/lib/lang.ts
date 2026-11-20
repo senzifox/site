@@ -10,9 +10,13 @@ export const LANG_COOKIE = "lang";
 
 export const LOCALES: Record<Lang, string> = { ru: "ru_RU", en: "en_US" };
 
+export const INTL_LOCALES: Record<Lang, string> = { ru: "ru-RU", en: "en-US" };
+
 export const isLang = (value: unknown): value is Lang => LANGS.includes(value as Lang);
 
 export const langPath = (base: string, lang: Lang) => (lang === DEFAULT_LANG ? base : `${base}/${lang}`);
+
+export const langChoice = (base: string, lang: Lang) => `${base}?${LANG_PARAM}=${lang}`;
 
 export const acceptedLang = (header: string | null): Lang | null => {
   if (!header?.trim()) return null;
@@ -27,3 +31,8 @@ export const acceptedLang = (header: string | null): Lang | null => {
     .sort((a, b) => b.q - a.q);
   return ranked.map(({ lang }) => lang).find(isLang) ?? "en";
 };
+
+export const preferredLang = (
+  saved: string | null | undefined,
+  acceptLanguage: string | null,
+): Lang | null => (isLang(saved) ? saved : acceptedLang(acceptLanguage));

@@ -1,3 +1,6 @@
+import type { Lang } from "@/content/types";
+import { DEFAULT_LANG, INTL_LOCALES } from "@/lib/lang";
+
 export const formatTime = (ms: number) => {
   const totalSeconds = Math.max(0, Math.floor(ms / 1000));
   const minutes = Math.floor(totalSeconds / 60);
@@ -31,19 +34,21 @@ const UNITS = [
   ["minute", 60],
 ] as const;
 
-export const formatAgo = (date: Date | string, now = new Date()) => {
+const JUST_NOW: Record<Lang, string> = { ru: "только что", en: "just now" };
+
+export const formatAgo = (date: Date | string, now = new Date(), lang: Lang = DEFAULT_LANG) => {
   const seconds = Math.max(0, (now.getTime() - new Date(date).getTime()) / 1000);
   const unit = UNITS.find(([, size]) => seconds >= size);
-  if (!unit) return "только что";
-  return new Intl.RelativeTimeFormat("ru", { numeric: "auto" }).format(
+  if (!unit) return JUST_NOW[lang];
+  return new Intl.RelativeTimeFormat(INTL_LOCALES[lang], { numeric: "auto" }).format(
     -Math.floor(seconds / unit[1]),
     unit[0],
   );
 };
 
-export const formatDateTime = (timeZone: string, date: Date) => {
+export const formatDateTime = (timeZone: string, date: Date, lang: Lang = DEFAULT_LANG) => {
   try {
-    return new Intl.DateTimeFormat("ru-RU", {
+    return new Intl.DateTimeFormat(INTL_LOCALES[lang], {
       timeZone,
       day: "2-digit",
       month: "2-digit",
@@ -56,9 +61,13 @@ export const formatDateTime = (timeZone: string, date: Date) => {
   }
 };
 
-export const formatClock = (timeZone: string, date = new Date()) => {
+export const formatClock = (timeZone: string, date = new Date(), lang: Lang = DEFAULT_LANG) => {
   try {
-    return new Intl.DateTimeFormat("ru-RU", { timeZone, hour: "2-digit", minute: "2-digit" }).format(date);
+    return new Intl.DateTimeFormat(INTL_LOCALES[lang], {
+      timeZone,
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(date);
   } catch {
     return "";
   }

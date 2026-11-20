@@ -54,6 +54,7 @@ export type Lang = "ru" | "en";
 
 export type ProjectDetails = {
   icon?: string;
+  description?: Partial<Record<Lang, string>>;
   blocks?: Partial<Record<Lang, Block[]>>;
   wiki?: Partial<Record<Lang, string>>;
 };

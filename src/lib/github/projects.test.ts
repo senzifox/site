@@ -1,9 +1,11 @@
 import { describe, expect, it } from "vitest";
 import {
   type GithubRepo,
+  projectDescription,
   projectLangChoice,
   projectLangs,
   projectPath,
+  projectPathIn,
   toProjects,
   toRelease,
 } from "./projects";
@@ -87,5 +89,16 @@ describe("project languages", () => {
     expect(projectPath("mod", "ru")).toBe("/mod");
     expect(projectPath("mod", "en")).toBe("/mod/en");
     expect(projectLangChoice("mod", "en")).toBe("/mod?lang=en");
+  });
+
+  it("links to the page in the asked language when it exists", () => {
+    expect(projectPathIn({ slug: "mod", blocks: { en: [] } }, "en")).toBe("/mod/en");
+    expect(projectPathIn({ slug: "mod", blocks: {} }, "en")).toBe("/mod");
+  });
+
+  it("prefers a local description in the asked language", () => {
+    const [project] = toProjects([repo("mod")], "fox", { mod: { description: { en: "a mod" } } });
+    expect(projectDescription(project, "en")).toBe("a mod");
+    expect(projectDescription(project, "ru")).toBe("mod description");
   });
 });

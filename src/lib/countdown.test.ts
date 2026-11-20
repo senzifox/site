@@ -54,7 +54,7 @@ describe("helpers", () => {
   });
 
   it("picks russian plural forms", () => {
-    const days = ["день", "дня", "дней"] as const;
+    const days = { one: "день", few: "дня", other: "дней" };
     expect([1, 3, 5, 11, 21, 67].map((n) => plural(n, days))).toEqual([
       "день",
       "дня",
@@ -65,8 +65,14 @@ describe("helpers", () => {
     ]);
   });
 
+  it("picks english plural forms", () => {
+    const days = { one: "day", other: "days" };
+    expect([0, 1, 2, 21].map((n) => plural(n, days, "en"))).toEqual(["days", "day", "days", "days"]);
+  });
+
   it("formats percent and relative days", () => {
     expect(formatPercent(0.8165)).toBe("81.7%");
     expect(formatInDays(at("2027-01-01T00:00:00Z"), at("2026-10-25T00:00:00Z"))).toBe("через 68 дней");
+    expect(formatInDays(at("2027-01-01T00:00:00Z"), at("2026-10-25T00:00:00Z"), "en")).toBe("in 68 days");
   });
 });

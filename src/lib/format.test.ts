@@ -37,11 +37,20 @@ describe("formatAgo", () => {
     expect(formatAgo("2026-10-05T09:00:00Z", now)).toBe("3 часа назад");
     expect(formatAgo("2026-10-04T12:00:00Z", now)).toBe("вчера");
   });
+
+  it("formats relative english time", () => {
+    expect(formatAgo("2026-10-05T11:59:30Z", now, "en")).toBe("just now");
+    expect(formatAgo("2026-10-05T09:00:00Z", now, "en")).toBe("3 hours ago");
+    expect(formatAgo("2026-10-04T12:00:00Z", now, "en")).toBe("yesterday");
+  });
 });
 
 describe("formatDateTime", () => {
   it("formats the date and time in the given zone", () => {
     expect(formatDateTime("Europe/Moscow", new Date("2026-10-16T17:15:00Z"))).toBe("16.10.2026, 20:15");
+    expect(formatDateTime("Europe/Moscow", new Date("2026-10-16T17:15:00Z"), "en")).toBe(
+      "10/16/2026, 08:15 PM",
+    );
   });
 
   it("falls back to ISO for an unknown zone", () => {

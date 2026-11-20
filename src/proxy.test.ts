@@ -1,21 +1,20 @@
 import { NextRequest } from "next/server";
 import { describe, expect, it } from "vitest";
 import { terminal } from "@/content/terminal";
-import { config, proxy, translatedProjects } from "./proxy";
+import { config, proxy, translatedPages } from "./proxy";
 
 const request = (path: string, headers: Record<string, string> = {}) =>
   new NextRequest(new URL(path, "https://senzi.dev"), { headers });
 
 describe("proxy matcher", () => {
-  it("covers every terminal variant and translated project", () => {
+  it("covers every terminal variant and translated page", () => {
     const terminalPaths = Object.keys(terminal).map((variant) => (variant === "main" ? "/" : `/${variant}`));
-    const projectPaths = translatedProjects.map((slug) => `/${slug}`);
-    expect([...config.matcher].sort()).toEqual([...terminalPaths, ...projectPaths].sort());
+    expect([...config.matcher].sort()).toEqual([...terminalPaths, ...Object.keys(translatedPages)].sort());
   });
 });
 
 describe("proxy for translated projects", () => {
-  const [slug] = translatedProjects;
+  const slug = "foxyfriends";
 
   it("sends foreign browsers to the english page", () => {
     const response = proxy(request(`/${slug}`, { "accept-language": "de-DE,de;q=0.9" }));
@@ -42,6 +41,17 @@ describe("proxy for translated projects", () => {
 
     const toRussian = proxy(request(`/${slug}?lang=ru`, { "accept-language": "en" }));
     expect(toRussian.headers.get("location")).toBe(`https://senzi.dev/${slug}`);
+    expect(toRussian.cookies.get("lang")?.value).toBe("ru");
+  });
+});
+
+describe("proxy for translated wikis", () => {
+  it("sends foreign browsers to the english wiki and saves an explicit choice", () => {
+    const foreign = proxy(request("/foxyfriends/wiki", { "accept-language": "de-DE" }));
+    expect(foreign.headers.get("location")).toBe("https://senzi.dev/foxyfriends/wiki/en");
+
+    const toRussian = proxy(request("/foxyfriends/wiki?lang=ru", { "accept-language": "en" }));
+    expect(toRussian.headers.get("location")).toBe("https://senzi.dev/foxyfriends/wiki");
     expect(toRussian.cookies.get("lang")?.value).toBe("ru");
   });
 });

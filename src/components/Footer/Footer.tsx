@@ -1,12 +1,12 @@
 import { Fragment } from "react";
 import { profile } from "@/content/profile";
-import type { FooterContent } from "@/content/types";
+import type { FooterContent, Lang } from "@/content/types";
 import { commitUrl, build as current } from "@/lib/build";
 import { BuildTime } from "./BuildTime";
 import styles from "./Footer.module.css";
 import { Tail } from "./Tail";
 
-function BuildLine({ label }: { label: string }) {
+function BuildLine({ label, lang }: { label: string; lang: Lang }) {
   const url = commitUrl(profile.links.repo, current.sha);
   return (
     <span className={styles.build}>
@@ -19,12 +19,14 @@ function BuildLine({ label }: { label: string }) {
         current.sha
       )}
       {" · "}
-      <BuildTime time={current.time} timeZone={profile.timeZone} />
+      <BuildTime time={current.time} timeZone={profile.timeZone} lang={lang} />
     </span>
   );
 }
 
-export function Footer({ text, links, build }: FooterContent) {
+type Props = FooterContent & { lang: Lang };
+
+export function Footer({ text, links, build, lang }: Props) {
   return (
     <footer className={styles.footer}>
       <div className={styles.divider} aria-hidden="true">
@@ -43,7 +45,7 @@ export function Footer({ text, links, build }: FooterContent) {
           </Fragment>
         ))}
       </span>
-      {build && <BuildLine label={build} />}
+      {build && <BuildLine label={build} lang={lang} />}
     </footer>
   );
 }

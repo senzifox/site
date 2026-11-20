@@ -12,16 +12,17 @@ import { Icon } from "@/components/Icon/Icon";
 import { LangSwitch } from "@/components/LangSwitch/LangSwitch";
 import { ProjectIcon } from "@/components/ProjectIcon/ProjectIcon";
 import { site } from "@/content/site";
+import { sites } from "@/content/sites";
 import type { Lang } from "@/content/types";
 import {
   getProjectPage,
   getProjectsOrNone,
+  projectDescription,
   projectLangChoice,
   projectLangs,
   projectPath,
 } from "@/lib/github/projects";
 import { wikiLangs, wikiPath } from "@/lib/github/wiki";
-import { LOCALES } from "@/lib/lang";
 import { pageMetadata } from "@/lib/metadata";
 import styles from "./page.module.css";
 
@@ -46,10 +47,10 @@ export const projectStaticParams = async (lang: Lang) =>
 export const projectMetadata = async (slug: string, lang: Lang): Promise<Metadata> => {
   const project = await loadProject(slug, lang);
   return pageMetadata({
-    title: `${project.name} · ${site.header.name}`,
-    description: project.description,
+    title: `${project.name} · ${sites[lang].header.name}`,
+    description: projectDescription(project, lang),
     path: projectPath(project.slug, lang),
-    locale: LOCALES[lang],
+    lang,
     languages: Object.fromEntries(
       projectLangs(project).map((each) => [each, projectPath(project.slug, each)]),
     ),
@@ -66,7 +67,9 @@ const isExternal = (url: string) => {
 
 export async function ProjectPage({ slug, lang }: { slug: string; lang: Lang }) {
   const project = await loadProject(slug, lang);
-  const { name, description, topics, url, homepage, icon, blocks, release } = project;
+  const { name, topics, url, homepage, icon, blocks, release } = project;
+  const description = projectDescription(project, lang);
+  const { footer } = sites[lang];
   const text = TEXT[lang];
   const wikis = wikiLangs(project);
   const wikiLang = wikis.includes(lang) ? lang : wikis[0];
@@ -125,8 +128,8 @@ export async function ProjectPage({ slug, lang }: { slug: string; lang: Lang }) 
             )}
           </div>
         </Card>
-        <Blocks blocks={blocks[lang] ?? []} />
-        {site.footer && <Footer {...site.footer} />}
+        <Blocks blocks={blocks[lang] ?? []} lang={lang} />
+        {footer && <Footer {...footer} lang={lang} />}
       </main>
     </>
   );

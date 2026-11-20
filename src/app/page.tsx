@@ -24,8 +24,8 @@ export default function Home() {
         socials={<SocialLinks items={header.socials} />}
       />
       <main className={styles.main}>
-        <Blocks blocks={blocks} />
-        {footer && <Footer {...footer} />}
+        <Blocks blocks={blocks} lang="ru" />
+        {footer && <Footer {...footer} lang="ru" />}
       </main>
     </div>
   );

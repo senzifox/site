@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { acceptedLang, langPath } from "./lang";
+import { acceptedLang, langPath, preferredLang } from "./lang";
 
 describe("acceptedLang", () => {
   it("is unknown without the header", () => {
@@ -24,5 +24,13 @@ describe("langPath", () => {
   it("keeps the default language at the base path", () => {
     expect(langPath("/mod", "ru")).toBe("/mod");
     expect(langPath("/mod/wiki", "en")).toBe("/mod/wiki/en");
+  });
+});
+
+describe("preferredLang", () => {
+  it("prefers a saved choice over the browser languages", () => {
+    expect(preferredLang("ru", "en-US")).toBe("ru");
+    expect(preferredLang("de", "en-US")).toBe("en");
+    expect(preferredLang(undefined, null)).toBeNull();
   });
 });

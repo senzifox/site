@@ -1,8 +1,10 @@
 import type { Lang } from "@/content/types";
-import { LANGS, langPath } from "@/lib/lang";
+import { DEFAULT_LANG, LANGS, langChoice, langPath } from "@/lib/lang";
 import { findProject, getRawText, type Project, rawUrl } from "./projects";
 
 export const wikiPath = (slug: string, lang: Lang) => langPath(`/${slug}/wiki`, lang);
+
+export const wikiLangChoice = (slug: string, lang: Lang) => langChoice(wikiPath(slug, DEFAULT_LANG), lang);
 
 export const wikiLangs = ({ wiki }: Pick<Project, "wiki">) => LANGS.filter((lang) => wiki[lang]);
 

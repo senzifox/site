@@ -2,7 +2,7 @@ import { profile } from "@/content/profile";
 import { projectDetails } from "@/content/projects";
 import type { Block, Lang, ProjectDetails } from "@/content/types";
 import { HttpError } from "@/lib/http";
-import { DEFAULT_LANG, LANG_PARAM, LANGS, langPath } from "@/lib/lang";
+import { DEFAULT_LANG, LANGS, langChoice, langPath } from "@/lib/lang";
 
 export const PROJECTS_REVALIDATE_S = 900;
 
@@ -13,6 +13,7 @@ export type Project = {
   name: string;
   repo: string;
   description: string;
+  descriptions: Partial<Record<Lang, string>>;
   topics: string[];
   url: string;
   homepage: string | null;
@@ -57,12 +58,13 @@ export const toProjects = (
     .sort((a, b) => b.pushed_at.localeCompare(a.pushed_at))
     .map((repo) => {
       const slug = repo.name.toLowerCase();
-      const { icon, blocks = {}, wiki = {} } = details[slug] ?? {};
+      const { icon, description = {}, blocks = {}, wiki = {} } = details[slug] ?? {};
       return {
         slug,
         name: repo.name,
         repo: repo.full_name,
         description: repo.description?.trim() ?? "",
+        descriptions: description,
         topics: (repo.topics ?? []).filter((name) => name !== topic),
         url: repo.html_url,
         homepage: repo.homepage?.trim() || null,
@@ -75,10 +77,16 @@ export const toProjects = (
 export const projectPath = (slug: string, lang: Lang) => langPath(`/${slug}`, lang);
 
 export const projectLangChoice = (slug: string, lang: Lang) =>
-  `${projectPath(slug, DEFAULT_LANG)}?${LANG_PARAM}=${lang}`;
+  langChoice(projectPath(slug, DEFAULT_LANG), lang);
 
 export const projectLangs = ({ blocks }: Pick<Project, "blocks">) =>
   LANGS.filter((lang) => lang === DEFAULT_LANG || blocks[lang]);
+
+export const projectPathIn = (project: Pick<Project, "slug" | "blocks">, lang: Lang) =>
+  projectPath(project.slug, projectLangs(project).includes(lang) ? lang : DEFAULT_LANG);
+
+export const projectDescription = ({ description, descriptions }: Project, lang: Lang) =>
+  descriptions[lang] ?? description;
 
 export const toRelease = (release: GithubRelease): ProjectRelease => {
   const asset = release.assets.find(({ name }) => !/sources|javadoc|-dev\b/i.test(name)) ?? release.assets[0];
