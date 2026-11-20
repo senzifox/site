@@ -23,6 +23,7 @@ import {
   projectPath,
 } from "@/lib/github/projects";
 import { wikiLangs, wikiPath } from "@/lib/github/wiki";
+import { homePath } from "@/lib/lang";
 import { pageMetadata } from "@/lib/metadata";
 import styles from "./page.module.css";
 
@@ -82,7 +83,7 @@ export async function ProjectPage({ slug, lang }: { slug: string; lang: Lang }) 
       <Background />
       <main className={styles.main} lang={lang}>
         <div className={styles.bar}>
-          <HomeLink />
+          <HomeLink href={homePath(lang)} />
           <LangSwitch current={lang} links={langLinks} />
         </div>
         <Card className={styles.hero}>

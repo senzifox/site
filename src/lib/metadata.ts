@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import { alt, size } from "@/app/opengraph-image";
 import { sites } from "@/content/sites";
 import type { Lang } from "@/content/types";
 import { LOCALES } from "@/lib/lang";
+import { OG_SIZE, ogAlt, ogPath } from "@/lib/og";
 
 type PageMetadata = {
   title: string;
@@ -13,7 +13,7 @@ type PageMetadata = {
 };
 
 export const pageMetadata = ({ title, description, path, lang, languages }: PageMetadata): Metadata => {
-  const images = [{ url: "/opengraph-image", alt, ...size }];
+  const images = [{ url: ogPath(lang), alt: ogAlt(lang), ...OG_SIZE }];
   return {
     title,
     description,

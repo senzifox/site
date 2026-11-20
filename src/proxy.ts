@@ -3,7 +3,7 @@ import { projectDetails } from "@/content/projects";
 import type { Lang } from "@/content/types";
 import { projectPath } from "@/lib/github/projects";
 import { wikiPath } from "@/lib/github/wiki";
-import { DEFAULT_LANG, isLang, LANG_COOKIE, LANG_PARAM, LANGS, preferredLang } from "@/lib/lang";
+import { DEFAULT_LANG, homePath, isLang, LANG_COOKIE, LANG_PARAM, LANGS, preferredLang } from "@/lib/lang";
 
 const TERMINAL_UA = /curl|wget|httpie|libcurl|lwp|python-requests|powershell/i;
 
@@ -35,6 +35,8 @@ const uncacheable = (response: NextResponse, vary: string) => {
   return response;
 };
 
+const home: TranslatedPage = { langs: [...LANGS], pathIn: homePath };
+
 const isTerminal = (request: NextRequest) => TERMINAL_UA.test(request.headers.get("user-agent") ?? "");
 
 const toTerminal = (request: NextRequest) => {
@@ -44,29 +46,43 @@ const toTerminal = (request: NextRequest) => {
   return NextResponse.rewrite(url);
 };
 
+const redirectKeepingQuery = (request: NextRequest, path: string) => {
+  const url = new URL(path, request.url);
+  url.search = request.nextUrl.search;
+  url.searchParams.delete(LANG_PARAM);
+  return NextResponse.redirect(url);
+};
+
 const pageInLang = (request: NextRequest, { langs, pathIn }: TranslatedPage) => {
   const chosen = request.nextUrl.searchParams.get(LANG_PARAM);
   if (isLang(chosen) && langs.includes(chosen)) {
-    const response = NextResponse.redirect(new URL(pathIn(chosen), request.url));
+    const response = redirectKeepingQuery(request, pathIn(chosen));
     response.cookies.set(LANG_COOKIE, chosen, { path: "/", maxAge: LANG_COOKIE_MAX_AGE_S, sameSite: "lax" });
     return response;
   }
 
   const lang = preferredLang(request.cookies.get(LANG_COOKIE)?.value, request.headers.get("accept-language"));
   if (lang && lang !== DEFAULT_LANG && langs.includes(lang))
-    return NextResponse.redirect(new URL(pathIn(lang), request.url));
+    return redirectKeepingQuery(request, pathIn(lang));
 
   return NextResponse.next();
 };
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  if (pathname === "/")
+    return uncacheable(
+      isTerminal(request) ? toTerminal(request) : pageInLang(request, home),
+      "User-Agent, Accept-Language, Cookie",
+    );
+
   const page = translatedPages[pathname];
   if (page) return uncacheable(pageInLang(request, page), "Accept-Language, Cookie");
 
-  if (isTerminal(request)) return uncacheable(toTerminal(request), "User-Agent");
-  if (pathname !== "/") return uncacheable(NextResponse.redirect(new URL("/", request.url)), "User-Agent");
-  return uncacheable(NextResponse.next(), "User-Agent");
+  return uncacheable(
+    isTerminal(request) ? toTerminal(request) : NextResponse.redirect(new URL("/", request.url)),
+    "User-Agent",
+  );
 }
 
 export const config = {

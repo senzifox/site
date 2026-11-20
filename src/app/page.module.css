@@ -9,3 +9,10 @@
   flex-direction: column;
   gap: 12px;
 }
+
+.corner {
+  position: absolute;
+  top: 16px;
+  right: max(var(--gutter), calc((100% - var(--container)) / 2 + var(--gutter)));
+  z-index: 11;
+}

@@ -5,7 +5,6 @@ import { CardGlow } from "@/components/Card/CardGlow";
 import { DevMenu } from "@/components/DevMenu/DevMenu";
 import { site } from "@/content/site";
 import { theme } from "@/content/theme";
-import { personJsonLd } from "@/lib/jsonLd";
 import { defaults, tuningStyle } from "@/lib/tuning";
 import "./globals.css";
 
@@ -53,11 +52,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       style={tuningStyle(defaults) as CSSProperties}
     >
       <body suppressHydrationWarning>
-        <script
-          type="application/ld+json"
-          // biome-ignore lint/security/noDangerouslySetInnerHtml: static JSON-LD built from site config
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd()) }}
-        />
         {children}
         <CardGlow />
         <DevMenu />

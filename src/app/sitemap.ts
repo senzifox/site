@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { site } from "@/content/site";
 import { getProjectsOrNone, projectLangs, projectPath } from "@/lib/github/projects";
 import { wikiLangs, wikiPath } from "@/lib/github/wiki";
+import { homePath, LANGS } from "@/lib/lang";
 
 export const revalidate = 900;
 
@@ -9,7 +10,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const lastModified = new Date();
   const projects = await getProjectsOrNone();
   return [
-    { url: site.meta.url, lastModified, changeFrequency: "monthly", priority: 1 },
+    ...LANGS.map((lang) => ({
+      url: new URL(homePath(lang), site.meta.url).toString(),
+      lastModified,
+      changeFrequency: "monthly" as const,
+      priority: 1,
+    })),
     ...projects.flatMap((project) =>
       projectLangs(project).map((lang) => ({
         url: new URL(projectPath(project.slug, lang), site.meta.url).toString(),

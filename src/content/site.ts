@@ -9,6 +9,7 @@ export const site: Site = {
     locale: "ru_RU",
     keywords: [
       "сензи",
+      "сензифокс",
       "senzifox",
       "devops",
       "junior devops",
@@ -17,6 +18,9 @@ export const site: Site = {
       "fox",
       "senzifox dev",
       "senzi.dev",
+      "senzi dev",
+      "senzi fox",
+      "senzi fox dev",
     ],
   },
 

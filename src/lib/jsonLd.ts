@@ -1,12 +1,16 @@
-import { site } from "@/content/site";
+import { sites } from "@/content/sites";
+import type { Lang } from "@/content/types";
+import { homePath } from "@/lib/lang";
 
-export function personJsonLd() {
-  const { name, socials } = site.header;
-  const { url, description } = site.meta;
+export function personJsonLd(lang: Lang) {
+  const { name, socials } = sites[lang].header;
+  const { url, description } = sites[lang].meta;
 
   return {
     "@context": "https://schema.org",
     "@type": "ProfilePage",
+    inLanguage: lang,
+    url: new URL(homePath(lang), url).toString(),
     mainEntity: {
       "@type": "Person",
       name,

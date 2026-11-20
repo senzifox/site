@@ -55,3 +55,31 @@ describe("proxy for translated wikis", () => {
     expect(toRussian.cookies.get("lang")?.value).toBe("ru");
   });
 });
+
+describe("proxy for the home page", () => {
+  it("keeps terminals on the terminal page whatever the language", () => {
+    const response = proxy(request("/", { "user-agent": "curl/8.10", "accept-language": "en" }));
+    expect(response.headers.get("x-middleware-rewrite")).toBe("https://senzi.dev/terminal/main");
+  });
+
+  it("sends foreign browsers to the english home and saves an explicit choice", () => {
+    expect(proxy(request("/", { "accept-language": "en-US" })).headers.get("location")).toBe(
+      "https://senzi.dev/en",
+    );
+    expect(proxy(request("/", { "accept-language": "ru-RU" })).headers.get("location")).toBeNull();
+    expect(proxy(request("/")).headers.get("location")).toBeNull();
+
+    const toEnglish = proxy(request("/?lang=en", { "accept-language": "ru" }));
+    expect(toEnglish.headers.get("location")).toBe("https://senzi.dev/en");
+    expect(toEnglish.cookies.get("lang")?.value).toBe("en");
+  });
+
+  it("keeps the rest of the query when switching languages", () => {
+    expect(proxy(request("/?utm_source=x", { "accept-language": "en-US" })).headers.get("location")).toBe(
+      "https://senzi.dev/en?utm_source=x",
+    );
+    expect(proxy(request("/?lang=en&utm_source=x")).headers.get("location")).toBe(
+      "https://senzi.dev/en?utm_source=x",
+    );
+  });
+});

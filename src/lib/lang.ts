@@ -16,6 +16,8 @@ export const isLang = (value: unknown): value is Lang => LANGS.includes(value as
 
 export const langPath = (base: string, lang: Lang) => (lang === DEFAULT_LANG ? base : `${base}/${lang}`);
 
+export const homePath = (lang: Lang) => (lang === DEFAULT_LANG ? "/" : `/${lang}`);
+
 export const langChoice = (base: string, lang: Lang) => `${base}?${LANG_PARAM}=${lang}`;
 
 export const acceptedLang = (header: string | null): Lang | null => {
