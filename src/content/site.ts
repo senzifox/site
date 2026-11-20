@@ -102,4 +102,5 @@ export const site: Site = {
     ],
     build: "сборка",
   },
+  notFound: "такой страницы нет(",
 };

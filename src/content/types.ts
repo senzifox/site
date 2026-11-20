@@ -82,6 +82,7 @@ export type Site = {
   };
   blocks: Block[];
   footer?: FooterContent;
+  notFound: string;
 };
 
 export type FooterContent = { text: string; links?: { label: string; href: string }[]; build?: string };

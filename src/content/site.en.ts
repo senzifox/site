@@ -80,4 +80,5 @@ export const site: Site = {
     ],
     build: "build",
   },
+  notFound: "no such page(",
 };
