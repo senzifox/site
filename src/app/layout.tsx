@@ -3,6 +3,7 @@ import { JetBrains_Mono, Roboto_Flex } from "next/font/google";
 import type { CSSProperties, ReactNode } from "react";
 import { CardGlow } from "@/components/Card/CardGlow";
 import { DevMenu } from "@/components/DevMenu/DevMenu";
+import { PageViews } from "@/components/PageViews/PageViews";
 import { site } from "@/content/site";
 import { theme } from "@/content/theme";
 import { defaults, tuningStyle } from "@/lib/tuning";
@@ -55,6 +56,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         {children}
         <CardGlow />
         <DevMenu />
+        <PageViews />
       </body>
     </html>
   );
