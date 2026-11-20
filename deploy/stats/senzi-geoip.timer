@@ -1,5 +1,5 @@
 [Unit]
-Description=weekly maxmind geolite2 update
+Description=weekly geolite2 update
 
 [Timer]
 OnCalendar=Wed *-*-* 05:00

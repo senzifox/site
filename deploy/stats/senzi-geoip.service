@@ -1,11 +1,13 @@
 [Unit]
-Description=update maxmind geolite2 databases
+Description=update geolite2 databases from the p3terx mirror
 Wants=network-online.target
 After=network-online.target
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/geoipupdate
+User=goaccess
+Group=goaccess
+ExecStart=/usr/local/bin/senzi-geoip
 StateDirectory=GeoIP
 StateDirectoryMode=0755
 NoNewPrivileges=yes
