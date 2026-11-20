@@ -89,6 +89,7 @@ jobs:
           STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
           STEAM_ID: ${{ secrets.STEAM_ID }}
           GITHUB_TOKEN: ${{ secrets.GH_API_TOKEN }}
+          GOATCOUNTER_TOKEN: ${{ secrets.GOATCOUNTER_TOKEN }}
         run: |
           if [[ -n $TAG ]]; then
             export IMAGE="ghcr.io/${GITHUB_REPOSITORY,,}:$TAG"

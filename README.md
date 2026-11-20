@@ -49,6 +49,7 @@ pnpm dev
 | `STEAM_API_KEY`                              | [steam web api key](https://steamcommunity.com/dev/apikey)                                                             |
 | `STEAM_ID`                                   | [64-bit id or vanity name from the profile url](https://steamdb.com/en/tools/steam-id-finder)                          |
 | `GITHUB_TOKEN`                               | [fine-grained token](https://github.com/settings/personal-access-tokens), public repositories read-only                |
+| `GOATCOUNTER_TOKEN`                          | goatcounter api token with the count permission, only for download events in production                                |
 
 ## scripts
 
