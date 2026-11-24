@@ -1,0 +1,64 @@
+.spoiler {
+  position: relative;
+  padding: 0 2px;
+  margin: 0 -2px;
+  font: inherit;
+  text-align: inherit;
+  color: var(--text);
+  background: none;
+  border: 0;
+  border-radius: 4px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.spoiler:hover {
+  background-color: rgb(255 255 255 / 0.05);
+}
+
+.hidden {
+  visibility: hidden;
+}
+
+.dust {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.revealed {
+  outline: none;
+  animation: reveal 360ms ease-out;
+}
+
+.row td {
+  transition: filter 360ms ease-out;
+}
+
+.blurred {
+  cursor: pointer;
+}
+
+.blurred td:not(:has(.spoiler)) {
+  filter: blur(6px);
+  user-select: none;
+}
+
+@keyframes reveal {
+  from {
+    opacity: 0;
+    filter: blur(4px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .revealed {
+    animation: none;
+  }
+
+  .row td {
+    transition: none;
+  }
+}

@@ -54,6 +54,11 @@ export type HastNode = {
   children?: HastNode[];
 };
 
+export const SPOILER_HREF = "#spoiler";
+
+export const hasSpoiler = (node: HastNode): boolean =>
+  (node.tagName === "a" && node.properties?.href === SPOILER_HREF) || (node.children ?? []).some(hasSpoiler);
+
 const HEADINGS = new Set(["h1", "h2", "h3", "h4", "h5", "h6"]);
 
 const textOf = (node: HastNode): string =>

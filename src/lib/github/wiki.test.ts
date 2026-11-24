@@ -3,6 +3,7 @@ import {
   createSlugger,
   githubSlug,
   type HastNode,
+  hasSpoiler,
   rehypeWikiSections,
   resolveWikiUrl,
   wikiPath,
@@ -101,5 +102,23 @@ describe("rehypeWikiSections", () => {
     const tree: HastNode = { type: "root", children: [newline, element("h2", "A"), element("p", "a")] };
     rehypeWikiSections()(tree);
     expect(tree.children).toHaveLength(1);
+  });
+});
+
+describe("hasSpoiler", () => {
+  const cell = (children: HastNode[]): HastNode => ({ type: "element", tagName: "td", children });
+  const link = (href: string): HastNode => ({
+    type: "element",
+    tagName: "a",
+    properties: { href },
+    children: [{ type: "text", value: "Тайна" }],
+  });
+
+  it("finds a spoiler link nested anywhere", () => {
+    expect(hasSpoiler(cell([{ type: "element", tagName: "em", children: [link("#spoiler")] }]))).toBe(true);
+  });
+
+  it("ignores other links", () => {
+    expect(hasSpoiler(cell([link("#config"), { type: "text", value: "#spoiler" }]))).toBe(false);
   });
 });
