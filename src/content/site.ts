@@ -72,11 +72,6 @@ export const site: Site = {
       label: "проектиксы",
     },
     {
-      type: "list",
-      label: "то в чём я разбираюсь, или пытаюсь, стек короче",
-      items: profile.stack,
-    },
-    {
       type: "copy",
       icon: "mail",
       label: "сюда можно деловые предложения закинуть, но лучше в телеграмм",
@@ -88,6 +83,7 @@ export const site: Site = {
         "кстааа, ещё есть версия для терминала в стиле neofetch, попробуй curl senzi.dev, а также у него есть версии, /short, /full, /about, но смысла в них не то чтобы много",
       text: "",
     },
+    //  { type: "list", label: "то в чём я разбираюсь, или пытаюсь, стек короче", items: profile.stack, },
     //  { type: "status", label: "статус", text: "открыт к новым предложениям", state: "online", },
     //  { type: "clock", label: "у меня ща:", timeZone: "Europe/Moscow", },
     //  { type: "code", label: "neofetch", lines: ["тут типа в будущем можно код написать, пока не придумал что сюда"] },

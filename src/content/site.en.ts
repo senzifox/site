@@ -61,15 +61,15 @@ export const site: Site = {
       label: "projects",
     },
     {
-      type: "list",
-      label: "what i know, or try to, my stack basically",
-      items: profile.stack,
-    },
-    {
       type: "copy",
       icon: "mail",
       label: "business offers go here, but telegram is better",
       value: profile.mail,
+    },
+    {
+      type: "clock",
+      label: "my time rn",
+      timeZone: "Europe/Moscow",
     },
   ],
   footer: {
